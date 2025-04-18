@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35825.156 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcceInfoAPI", "AcceInfoAPI.csproj", "{09A8BC45-5AF7-4EC2-9016-4036204784D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "..\Common\Common.csproj", "{EC1C8BEB-EAA3-45D0-B528-A0E5B8435F68}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{09A8BC45-5AF7-4EC2-9016-4036204784D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09A8BC45-5AF7-4EC2-9016-4036204784D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09A8BC45-5AF7-4EC2-9016-4036204784D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09A8BC45-5AF7-4EC2-9016-4036204784D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC1C8BEB-EAA3-45D0-B528-A0E5B8435F68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC1C8BEB-EAA3-45D0-B528-A0E5B8435F68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC1C8BEB-EAA3-45D0-B528-A0E5B8435F68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC1C8BEB-EAA3-45D0-B528-A0E5B8435F68}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {552CE137-5AE1-40D7-8218-C22C87F07D78}
+	EndGlobalSection
+EndGlobal
