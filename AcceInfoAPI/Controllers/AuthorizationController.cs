@@ -7,6 +7,7 @@ using System.Net;
 namespace AcceInfoAPI.Controllers
 {
     [Route("api")]
+
     public class AuthorizationController : Controller
     {
         private readonly IConfiguration _configuration;
