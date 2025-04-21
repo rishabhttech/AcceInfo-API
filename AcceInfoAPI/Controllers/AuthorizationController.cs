@@ -7,6 +7,7 @@ using System.Net;
 namespace AcceInfoAPI.Controllers
 {
     [Route("api")]
+
     public class AuthorizationController : Controller
     {
         private readonly IConfiguration _configuration;
@@ -47,7 +48,7 @@ namespace AcceInfoAPI.Controllers
                     {
                         statusCode = System.Net.HttpStatusCode.OK,
                         Status = refreshtokenresponse.Status,
-                        Message = Constants.LOGIN_SUCCESSFULLY,
+                        Message = refreshtokenresponse.Message,
                         Name = loginRequest.Username,
                         Token = (string)refreshtokenresponse.Token,
                         RefreshToken = refreshtokenresponse.RefreshToken,
@@ -76,7 +77,8 @@ namespace AcceInfoAPI.Controllers
                         Name = employee.UserName,
                         Token = (string)tokenresponse.Token,
                         RefreshToken = tokenresponse.RefreshToken,
-                        ExpiresIn = tokenresponse.ExpiresIn
+                        ExpiresIn = tokenresponse.ExpiresIn,
+                        ContactId = (string)employee?.ContactId
                     });
                 }
                 return Unauthorized(new Common.Models.Response.LoginResponse
