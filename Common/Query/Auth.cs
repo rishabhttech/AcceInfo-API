@@ -8,7 +8,9 @@ namespace Common.Query
 {
     public class Auth
     {
-         public string DoLogin = @"
+        
+
+        public string DoLogin = @"
                 SELECT c.""ContactId"", c.""UserName"", c.""First Name"" AS ""FirstName"", c.""Last Name"" AS ""LastName""
                 FROM ""Contact"" c
                 JOIN ""ContactRoleJn"" crj ON c.""ContactId"" = crj.""ContactId""
@@ -32,6 +34,15 @@ namespace Common.Query
         @Name
     );
 ";
+
+        public string ContactDetails = @"
+SELECT 
+    c.*, 
+    c.""First Name"" AS ""FirstName"", 
+    c.""Last Name"" AS ""LastName"" 
+c.""Date of Birth"" AS ""DOB"" 
+FROM public.""Contact"" c 
+WHERE c.""ContactId"" = @CustomerId";
 
     }
     public class Account

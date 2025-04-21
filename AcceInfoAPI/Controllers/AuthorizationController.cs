@@ -1,6 +1,7 @@
 ﻿using Common.Helper;
 using Common.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -128,25 +129,72 @@ namespace AcceInfoAPI.Controllers
         }
 
         [HttpPost("auth/otp-verify")]
-        public IActionResult VerifyOtp([FromBody] Common.Models.Request.OtpRequest otpRequest)
+        public async Task<IActionResult> VerifyOtp([FromBody] Common.Models.Request.OtpRequest otpRequest)
         {
             if (otpRequest.otp == "123456")
             {
+                var contactId = _httpContextAccessor.HttpContext?.User?.FindFirst("contactId")?.Value;
+                var db = new Common.Helper.DBConnectionHelper(_configuration, _configuration[Common.Models.Constants.DB_CONNECTIONSTRING]);
+
+                var employee = await db.QuerySingleAsync<dynamic>(_auth.ContactDetails, new
+                {
+                    CustomerId = contactId,
+                });
+
                 return Ok(new
                 {
-                    status = "success",
-                    message = "OTP verified successfully."
+                    FirstName = employee.FirstName,
+                    LastName = employee.LastName,
+                    Email = employee.Email,
+                    MobileNumber = employee.MobileNumber,
+                    DOB = employee.DOB,
+                    Status = Constants.SUCCESS_STATUS,
+                    Statuscode = HttpStatusCode.OK
                 });
             }
             else
             {
                 return Ok(new
                 {
-                    status = "failed",
-                    message = "Invalid OTP."
+                    status = Constants.FAILED_STATUS,
+                    message = Constants.TOKEN_GENERATED_FAILED
                 });
             }
         }
+
+        [Authorize]
+        [HttpPost("user/details")]
+        public async Task<IActionResult> GetUserDetails()
+        {
+            try
+            {
+                var contactId = _httpContextAccessor.HttpContext?.User?.FindFirst("contactId")?.Value;
+                var db = new Common.Helper.DBConnectionHelper(_configuration, _configuration[Common.Models.Constants.DB_CONNECTIONSTRING]);
+
+                var employee = await db.QuerySingleAsync<dynamic>(_auth.ContactDetails, new
+                {
+                    CustomerId = contactId,
+                });
+
+                return Ok(new
+                {
+                    FirstName = employee.FirstName,
+                    LastName = employee.LastName,
+                    Email = employee.Email,
+                    MobileNumber = employee.MobileNumber,
+                    DOB = employee.DOB,
+                    Status = Constants.SUCCESS_STATUS,
+                    Statuscode = HttpStatusCode.OK
+                });
+            }
+            catch(Exception ex)
+            {
+                return Unauthorized(new { Status = Constants.FAILED_STATUS, Statuscode = HttpStatusCode.Unauthorized });
+            }
+            
+
+        }
+
         public IActionResult Index()
         {
             return View();
