@@ -10,6 +10,8 @@ namespace Common.Models.Response
         public int ExpiresIn { get; set; }
         public string RefreshToken { get; set; }
         public string ContactId { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
     }
     
 }
