@@ -55,3 +55,4 @@ nunit-*.xml
 /AcceInfoAPI/.vs
 
 /.vs
+/AcceInfoAPI/Properties/PublishProfiles/acceinfoapi - Web Deploy1.pubxml.user
