@@ -53,3 +53,7 @@ CodeCoverage/
 TestResult.xml
 nunit-*.xml
 /AcceInfoAPI/.vs
+/.vs/API Project/v17
+/.vs/API Project/FileContentIndex
+/.vs
+/AcceInfoAPI/Properties/PublishProfiles
