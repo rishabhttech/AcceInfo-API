@@ -9,7 +9,7 @@ namespace Common.Query
     public class Auth
     {
          public string DoLogin = @"
-                SELECT c.""ContactId"", c.""UserName""
+                SELECT c.""ContactId"", c.""UserName"", c.""First Name"" AS ""FirstName"", c.""Last Name"" AS ""LastName""
                 FROM ""Contact"" c
                 JOIN ""ContactRoleJn"" crj ON c.""ContactId"" = crj.""ContactId""
                 JOIN ""Roles"" r ON crj.""RoleId"" = r.""RoleId""
@@ -93,9 +93,6 @@ namespace Common.Query
     JOIN ""AccountCategory"" ac ON a.""AccountCategory"" = ac.""AccountCategoryId""
     WHERE a.""AccountId"" = @AccountId;
 ";
-
-
-
 
     }
 }

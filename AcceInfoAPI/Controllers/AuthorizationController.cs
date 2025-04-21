@@ -13,11 +13,13 @@ namespace AcceInfoAPI.Controllers
         private readonly IConfiguration _configuration;
         private Common.Query.Auth _auth;
         private Common.Query.Account _masterList;
-        public AuthorizationController(IConfiguration configuration)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public AuthorizationController(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _configuration = configuration;
             _auth = new Common.Query.Auth();
             _masterList = new Common.Query.Account();
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpPost("auth/login")]
@@ -42,7 +44,8 @@ namespace AcceInfoAPI.Controllers
                 }
                 if(!string.IsNullOrEmpty(loginRequest.RefreshToken))
                 {
-                    var refreshtokenresponse = authHelper.RefreshJwtToken(loginRequest.RefreshToken, loginRequest.Username, _configuration["Jwt:Key"], _configuration["Jwt:Issuer"], _configuration["Jwt:Audience"]);
+                    var contactId = _httpContextAccessor.HttpContext?.User?.FindFirst("contactId")?.Value;
+                    var refreshtokenresponse = authHelper.RefreshJwtToken(contactId, loginRequest.RefreshToken, loginRequest.Username, _configuration["Jwt:Key"], _configuration["Jwt:Issuer"], _configuration["Jwt:Audience"]);
 
                     return Ok(new Common.Models.Response.LoginResponse
                     {
@@ -67,7 +70,7 @@ namespace AcceInfoAPI.Controllers
                 if (employee != null)
                 {
                     
-                    var tokenresponse = authHelper.GenerateJwtToken(loginRequest.Username, _configuration["Jwt:Key"], _configuration["Jwt:Issuer"], _configuration["Jwt:Audience"]);
+                    var tokenresponse = authHelper.GenerateJwtToken(employee.UserName, employee.ContactId, _configuration["Jwt:Key"], _configuration["Jwt:Issuer"], _configuration["Jwt:Audience"]);
 
                     return Ok(new Common.Models.Response.LoginResponse
                     {
@@ -78,7 +81,9 @@ namespace AcceInfoAPI.Controllers
                         Token = (string)tokenresponse.Token,
                         RefreshToken = tokenresponse.RefreshToken,
                         ExpiresIn = tokenresponse.ExpiresIn,
-                        ContactId = (string)employee?.ContactId
+                        ContactId = (string)employee?.ContactId,
+                        FirstName = (string)employee?.FirstName,
+                        LastName = (string)employee?.LastName,
                     });
                 }
                 return Unauthorized(new Common.Models.Response.LoginResponse
