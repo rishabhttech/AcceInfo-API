@@ -55,13 +55,15 @@ WHERE c.""ContactId"" = @CustomerId";
         ""AccountNumber"",
         ""Balance"",
         ""Status"",
-        ""AccountCategory""
+        ""AccountCategory"",
+        ""Name""
     )
     VALUES (
         @AccountNumber,
         @Balance,
         @Status,
-        @AccountCategory
+        @AccountCategory,
+        @Name
     )
     RETURNING ""AccountId"";
 ";
@@ -83,6 +85,7 @@ WHERE c.""ContactId"" = @CustomerId";
     SELECT 
         a.""AccountId"",
         a.""AccountNumber"",
+        a.""Name"",
         ac.""Name"" AS ""AccountCategoryName"",
         ac.""AccountCategoryId"",
         a.""Balance""

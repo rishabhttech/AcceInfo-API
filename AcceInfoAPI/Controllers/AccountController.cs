@@ -59,7 +59,8 @@ namespace AcceInfoAPI.Controllers
                     AccountNumber = accountNumber,
                     Balance = request.Amount,
                     Status = true,
-                    AccountCategory = request.AccountType
+                    AccountCategory = request.AccountType,
+                    Name = request.AccountName
                 }, trx);
                 var contactAccountJnId = await conn.ExecuteScalarAsync<Guid>(_account.insertCustomerAccountSql, new
                 {
@@ -113,7 +114,8 @@ namespace AcceInfoAPI.Controllers
                     AccountNumber = (string)x.AccountNumber,
                     AccountCategoryName = (string)x.AccountCategoryName,
                     AccountCategoryId = (string)x.AccountCategoryId,
-                    Balance = (long)x.Balance
+                    Balance = (long)x.Balance,
+                    AccountName = (string)x.Name
                 });
 
 
