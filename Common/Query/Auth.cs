@@ -105,5 +105,20 @@ WHERE c.""ContactId"" = @CustomerId";
     WHERE a.""AccountId"" = @AccountId;
 ";
 
+        public string GetTransactionHistoryByAccountId = @"
+    SELECT 
+        t.""TransactionId"",
+        t.""TransactionFrom"",
+        t.""TransactionTo"",
+        t.""CreatedOn"",
+        t.""Amount"",
+        t.""Note"",
+        t.""TransactionType"",
+        t.""IsSelfTransfer""
+    FROM ""Transactions"" t
+    WHERE t.""Account"" = @AccountId
+    ORDER BY t.""CreatedOn"" DESC;
+";
     }
+
 }
