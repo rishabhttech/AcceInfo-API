@@ -1,10 +1,14 @@
 ﻿using Common.Helper;
 using Common.Models;
 using Common.Models.Request;
+using Common.Models.Response;
 using Common.Query;
 using Dapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace AcceInfoAPI.Controllers
 {
@@ -13,10 +17,13 @@ namespace AcceInfoAPI.Controllers
     {
         private readonly IConfiguration _configuration;
         private Common.Query.Account _account;
+        private Common.Query.Account _masterList;
+
 
         public AccountController(IConfiguration configuration)
         {
             _configuration = configuration;
+            _masterList = new Common.Query.Account();     
             _account = new Common.Query.Account();
         }
 
@@ -170,6 +177,67 @@ namespace AcceInfoAPI.Controllers
             }
 
         }
+
+        [Authorize]
+        [HttpPost("transaction-history")]
+        public async Task<IActionResult> GetTransactionHistoryByAccountId([FromBody] TransactionHistoryRequest request)
+        {
+            try
+            {
+                //var username = User.Identity?.Name;
+                //if (string.IsNullOrEmpty(username))
+                //{
+                //    return Unauthorized(new
+                //    {
+                //        Status = Constants.FAILED_STATUS,
+                //        Message = "Unauthorized access"
+                //    });
+                //}
+
+                if (string.IsNullOrEmpty(request.AccountId))
+                {
+                    return BadRequest(new
+                    {
+                        Status = Constants.ERROR_STATUS,
+                        Message = "AccountId is required."
+                    });
+                }
+
+                var db = new DBConnectionHelper(_configuration, _configuration[Constants.DB_CONNECTIONSTRING]);
+
+                var transactions = (await db.QueryAsync<dynamic>(_masterList.GetTransactionHistoryByAccountId, new
+                {
+                    AccountId = request.AccountId
+                })).ToList();
+
+                var result = transactions.Select(t => new TransactionHistoryResponse
+                {
+                    TransactionId = (string)t.TransactionId,
+                    TransactionFrom = (int)t.TransactionFrom,
+                    TransactionTo = (int)t.TransactionTo,
+                    CreatedOn = (DateTime)t.CreatedOn,
+                    Amount = (int)t.Amount,
+                    Note = (string)t.Note,
+                    TransactionType = (string)t.TransactionType,
+                    IsSelfTransfer = (bool)t.IsSelfTransfer
+                });
+
+                return Ok(new
+                {
+                    Status = Constants.SUCCESS_STATUS,
+                    Data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Status = Constants.FAILED_STATUS,
+                    Message = "An error occurred while retrieving transaction history"
+                });
+            }
+        }
+
 
         public IActionResult Index()
         {
