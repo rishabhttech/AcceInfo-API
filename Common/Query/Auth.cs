@@ -39,8 +39,8 @@ namespace Common.Query
 SELECT 
     c.*, 
     c.""First Name"" AS ""FirstName"", 
-    c.""Last Name"" AS ""LastName"" 
-c.""Date of Birth"" AS ""DOB"" 
+    c.""Last Name"" AS ""LastName"", 
+    c.""Date of Birth"" AS ""DOB""
 FROM public.""Contact"" c 
 WHERE c.""ContactId"" = @CustomerId";
 
