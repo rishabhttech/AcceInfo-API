@@ -69,12 +69,12 @@ namespace AcceInfoAPI.Controllers
                 }, trx);
 
                 await trx.CommitAsync();
-                return Ok(new Common.Models.Response.AccountResponse
-                {
-                    statusCode = System.Net.HttpStatusCode.OK,
-                    Status = Constants.SUCCESS_STATUS,
-                    Message = Constants.LOGIN_SUCCESSFULLY
-                });
+                //return Ok(new Common.Models.Response.AccountResponse
+                //{
+                //    statusCode = System.Net.HttpStatusCode.OK,
+                //    Status = Constants.SUCCESS_STATUS,
+                //    Message = Constants.LOGIN_SUCCESSFULLY
+                //});
             }
             catch (Exception ex)
             {
@@ -89,11 +89,6 @@ namespace AcceInfoAPI.Controllers
                     Message = Constants.LOGIN_FAILED
                 });
             }
-
-            
-
-
-
             var newAccountId = Guid.NewGuid().ToString();
 
             return Ok(new
