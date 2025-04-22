@@ -136,6 +136,16 @@ namespace AcceInfoAPI.Controllers
             if (otpRequest.otp == "123456")
             {
                 var contactId = _httpContextAccessor.HttpContext?.User?.FindFirst("contactId")?.Value;
+
+                if (string.IsNullOrEmpty(contactId))
+                {
+                    return BadRequest(new
+                    {
+                        Status = Constants.FAILED_STATUS,
+                        Message = "Missing contactId in token."
+                    });
+                }
+
                 var db = new Common.Helper.DBConnectionHelper(_configuration, _configuration[Common.Models.Constants.DB_CONNECTIONSTRING]);
 
                 var employee = await db.QuerySingleAsync<dynamic>(_auth.ContactDetails, new
@@ -143,27 +153,43 @@ namespace AcceInfoAPI.Controllers
                     CustomerId = contactId,
                 });
 
-                return Ok(new
+                if (employee == null)
                 {
-                    FirstName = employee.FirstName,
-                    LastName = employee.LastName,
-                    Email = employee.Email,
-                    MobileNumber = employee.MobileNumber,
-                    DOB = employee.DOB,
+                    return NotFound(new
+                    {
+                        Status = Constants.FAILED_STATUS,
+                        Message = "Employee not found for given contactId."
+                    });
+                }
+
+                // Generate token using AuthHelper
+                AuthHelper authHelper = new AuthHelper(_configuration);
+                var tokenResponse = authHelper.GenerateJwtToken(employee.UserName, contactId, _configuration["Jwt:Key"], _configuration["Jwt:Issuer"], _configuration["Jwt:Audience"]);
+
+                return Ok(new Common.Models.Response.LoginResponse
+                {
+                    statusCode = HttpStatusCode.OK,
                     Status = Constants.SUCCESS_STATUS,
-                    Statuscode = HttpStatusCode.OK
+                    Message = Constants.LOGIN_SUCCESSFULLY,
+                    Name = employee.UserName,
+                    Token = tokenResponse.Token,
+                    RefreshToken = tokenResponse.RefreshToken,
+                    ExpiresIn = tokenResponse.ExpiresIn,
+                    ContactId = contactId,
+                    FirstName = employee.FirstName,
+                    LastName = employee.LastName
                 });
             }
             else
             {
-                return Ok(new
+                return Ok(new Common.Models.Response.LoginResponse
                 {
-                    status = Constants.FAILED_STATUS,
-                    message = Constants.TOKEN_GENERATED_FAILED
+                    Status = Constants.FAILED_STATUS,
+                    statusCode = HttpStatusCode.Unauthorized,
+                    Message = Constants.TOKEN_GENERATED_FAILED
                 });
             }
         }
-
         [Authorize]
         [HttpPost("user/details")]
         public async Task<IActionResult> GetUserDetails()
