@@ -175,7 +175,7 @@ namespace AcceInfoAPI.Controllers
         }
 
         [Authorize]
-        [HttpPost("transaction-history")]
+        [HttpGet("transaction-history")]
         public async Task<IActionResult> GetTransactionHistoryByAccountId([FromBody] TransactionHistoryRequest request)
         {
             try
@@ -196,22 +196,30 @@ namespace AcceInfoAPI.Controllers
                     AccountId = request.AccountId
                 })).ToList();
 
+                //if (transactions == null || transactions.Count == 0)
+                //{
+                //    return Ok(new
+                //    {
+                //        Status = Constants.SUCCESS_STATUS,
+                //        Data = new List<TransactionHistoryResponse>() // Make sure it's still wrapped in "Data"
+                //    });
+                //}
+
                 var result = transactions.Select(t => new TransactionHistoryResponse
                 {
                     TransactionId = (string)t.TransactionId,
-                    TransactionFrom = (int)t.TransactionFrom,
-                    TransactionTo = (int)t.TransactionTo,
+                    TransactionFrom = (string)t.TransactionFrom,
+                    TransactionTo = (string)t.TransactionTo,
                     CreatedOn = (DateTime)t.CreatedOn,
                     Amount = (int)t.Amount,
                     Note = (string)t.Note,
                     TransactionType = (string)t.TransactionType,
                     IsSelfTransfer = (bool)t.IsSelfTransfer
-                });
-
+                }).ToList(); 
                 return Ok(new
                 {
                     Status = Constants.SUCCESS_STATUS,
-                    Data = result
+                    Data = result // Standardized with Transfer API
                 });
             }
             catch (Exception ex)
@@ -219,12 +227,13 @@ namespace AcceInfoAPI.Controllers
                 return StatusCode(500, new
                 {
                     Status = Constants.FAILED_STATUS,
-                    Message = "An error occurred while retrieving transaction history"
+                    Message = "An error occurred while retrieving transaction history",
+                    Error = ex.Message
                 });
             }
         }
 
-        [Authorize]
+        [Authorize]
         [HttpPost("transfer-money")]
         public async Task<IActionResult> GetTransferMoney([FromBody] TransferRequest request)
         {
