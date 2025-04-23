@@ -235,6 +235,94 @@ namespace AcceInfoAPI.Controllers
             }
         }
 
+        [Authorize]
+        [HttpPost("transfer-money")]
+        public async Task<IActionResult> GetTransferMoney([FromBody] TransferRequest request)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(request.AccountNumberTo))
+                {
+                    return BadRequest(new
+                    {
+                        Status = Constants.ERROR_STATUS,
+                        Message = "AccountNumber To is required."
+                    });
+                }
+
+
+
+                if (string.IsNullOrEmpty(request.AccountNumberFrom))
+                {
+                    return BadRequest(new
+                    {
+                        Status = Constants.ERROR_STATUS,
+                        Message = "AccountNumber From is required."
+                    });
+                }
+
+
+
+                if (request.Amount <= 0)
+                {
+                    return BadRequest(new
+                    {
+                        Status = Constants.ERROR_STATUS,
+                        Message = "Amount should be greater than zero."
+                    });
+                }
+
+
+
+                var db = new DBConnectionHelper(_configuration, _configuration[Constants.DB_CONNECTIONSTRING]);
+
+
+
+                int rowsAffected = await db.ExecuteAsync(_masterList.TransferbyAccount, new
+                {
+                    AccountNumberFrom = request.AccountNumberFrom,
+                    AccountNumberTo = request.AccountNumberTo,
+                    Amount = request.Amount,
+                });
+
+
+
+                if (rowsAffected > 0)
+                {
+                    var transferResult = new TransferResponse
+                    {
+                        AccountNumberFrom = request.AccountNumberFrom,
+                        AccountNumberTo = request.AccountNumberTo,
+                        Amount = request.Amount,
+                    };
+
+
+
+                    return Ok(new
+                    {
+                        Status = Constants.SUCCESS_STATUS,
+                        Data = transferResult
+                    });
+                }
+                else
+                {
+                    return StatusCode(500, new
+                    {
+                        Status = Constants.FAILED_STATUS,
+                        Message = "Transfer failed. No rows affected."
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Status = Constants.FAILED_STATUS,
+                    Message = "An error occurred while transferring money.",
+                    Error = ex.Message
+                });
+            }
+        }
 
         public IActionResult Index()
         {

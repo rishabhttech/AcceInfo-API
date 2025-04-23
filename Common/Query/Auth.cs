@@ -122,6 +122,21 @@ WHERE c.""ContactId"" = @CustomerId";
     WHERE t.""Account"" = @AccountId
     ORDER BY t.""CreatedOn"" DESC;
 ";
-    }
 
+        public string TransferbyAccount = @"
+    BEGIN;
+
+    UPDATE ""Account""
+    SET ""Balance"" = ""Balance"" - @Amount
+    WHERE ""AccountNumber"" = @AccountNumberFrom;
+
+    UPDATE ""Account""
+    SET ""Balance"" = ""Balance"" + @Amount
+    WHERE ""AccountNumber"" = @AccountNumberTo;
+
+    COMMIT;
+";
+    }
 }
+
+

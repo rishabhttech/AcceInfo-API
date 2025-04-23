@@ -72,7 +72,6 @@ namespace AcceInfoAPI.Controllers
 
                 if (employee != null)
                 {
-                    
                     var tokenresponse = authHelper.GenerateJwtToken(employee.UserName, employee.ContactId, _configuration["Jwt:Key"], _configuration["Jwt:Issuer"], _configuration["Jwt:Audience"]);
 
                     return Ok(new Common.Models.Response.LoginResponse
@@ -104,9 +103,7 @@ namespace AcceInfoAPI.Controllers
                     statusCode = System.Net.HttpStatusCode.Unauthorized,
                     Message = Constants.LOGIN_FAILED
                 });
-            }
-           
-            
+            } 
         }
 
         
@@ -190,6 +187,7 @@ namespace AcceInfoAPI.Controllers
                 });
             }
         }
+
         [Authorize]
         [HttpPost("user/details")]
         public async Task<IActionResult> GetUserDetails()
@@ -219,8 +217,6 @@ namespace AcceInfoAPI.Controllers
             {
                 return Unauthorized(new { Status = Constants.FAILED_STATUS, Statuscode = HttpStatusCode.Unauthorized });
             }
-            
-
         }
 
 
