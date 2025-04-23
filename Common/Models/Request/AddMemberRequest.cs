@@ -9,8 +9,6 @@ namespace Common.Models.Request
 {
     public class AddMemberRequest
     {
-
-        public string NickName { get; set; }
         [Required(ErrorMessage = Constants.NAME_REQUIRED_MESSAGE)]
         public string Name { get; set; }
 
@@ -22,18 +20,14 @@ namespace Common.Models.Request
         [Phone(ErrorMessage = Constants.INVALID_PHONE)]
         public string ContactNumber { get; set; }
 
-        [Required(ErrorMessage = Constants.TRANSFER_METHOD_PHONE)]
-        public string TransferMethod { get; set; }
+        public bool IstransferByEmail { get; set; }
+        public bool IstransferByMobile { get; set; }
+        public string NickName { get; set; }
 
         [Required(ErrorMessage = Constants.PREFERRED_METHOD_LANGUAGE)]
         public string PrefLanguage { get; set; }
+        public string SecurityQuestion { get; set; }
+        public string SecurityAnswer { get; set; }
 
-        [Required(ErrorMessage = Constants.ACCOUNT_NUMBER_REQUIRED)]
-        public string AccountNumber { get; set; }
-
-        [Required(ErrorMessage =Constants.ACCOUNT_TYPE_REQURED)]
-        public string Accounttype { get; set; }
-
-        
     }
 }
