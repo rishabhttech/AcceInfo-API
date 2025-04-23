@@ -178,6 +178,22 @@ WHERE crj.""MemberId"" IS NOT NULL
   AND crj.""ContactId"" = @ContactId;
 ";
 
-      
+
+
+        public string TransferbyAccount = @"
+    BEGIN;
+
+    UPDATE ""Account""
+    SET ""Balance"" = ""Balance"" - @Amount
+    WHERE ""AccountNumber"" = @AccountNumberFrom;
+
+    UPDATE ""Account""
+    SET ""Balance"" = ""Balance"" + @Amount
+    WHERE ""AccountNumber"" = @AccountNumberTo;
+
+    COMMIT;
+";
+
+
     }
 }
