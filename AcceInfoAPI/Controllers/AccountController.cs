@@ -50,7 +50,6 @@ namespace AcceInfoAPI.Controllers
             try
             {
                 string accountNumber = Common.Helper.AuthHelper.Generate13DigitAccountNumber();
-                string AccountId = Guid.NewGuid().ToString();
                 string CustomerAccountJnId = Guid.NewGuid().ToString();
                 
 
@@ -181,16 +180,6 @@ namespace AcceInfoAPI.Controllers
         {
             try
             {
-                //var username = User.Identity?.Name;
-                //if (string.IsNullOrEmpty(username))
-                //{
-                //    return Unauthorized(new
-                //    {
-                //        Status = Constants.FAILED_STATUS,
-                //        Message = "Unauthorized access"
-                //    });
-                //}
-
                 if (string.IsNullOrEmpty(request.AccountId))
                 {
                     return BadRequest(new
