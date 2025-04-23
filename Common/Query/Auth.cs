@@ -120,7 +120,6 @@ WHERE c.""ContactId"" = @CustomerId";
         t.""TransactionType"",
         t.""IsSelfTransfer""
     FROM ""Transactions"" t
-    WHERE t.""Account"" = @AccountId
     ORDER BY t.""CreatedOn"" DESC;
 ";
 

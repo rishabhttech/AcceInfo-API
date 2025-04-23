@@ -15,18 +15,18 @@ namespace Common.Models.Response
     {
         public string AccountId { get; set; }
     }
-    
+
     public class TransactionHistoryResponse
     {
         public string TransactionId { get; set; }
-        public int TransactionFrom { get; set; }
-        public int TransactionTo { get; set; }
+        public string? TransactionFrom { get; set; }
+        public string? TransactionTo { get; set; }
         public DateTime CreatedOn { get; set; }
         public int Amount { get; set; }
-        public string Note { get; set; }
-        public string TransactionType { get; set; }
+        public string? Note { get; set; }
+        public string? TransactionType { get; set; }
         public bool IsSelfTransfer { get; set; }
     }
-    
+
 
 }
