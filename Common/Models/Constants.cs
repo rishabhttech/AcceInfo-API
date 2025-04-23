@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,6 +16,7 @@ namespace Common.Models
         public static readonly string SUCCESS_STATUS = "Success";
         public static readonly string FAILED_STATUS = "Failed";
         public static readonly string ERROR_STATUS = "An Error Occured";
+        public static readonly string DATA_FOUND_SUCCESSFULLY = "Data found Successfully";
 
         public static readonly string LOGIN_SUCCESSFULLY = "Login Successfull";
         public static readonly string LOGIN_FAILED = "Login Failed";
@@ -35,6 +38,23 @@ namespace Common.Models
         public const string ACCOUNT_AccountType_REQUIRED = "Account Type is required.";
         public const string ACCOUNT_Amount_REQUIRED = "Amount is required.";
         public const string ACCOUNT_VALID_AMOUNT_ERROR = "Amount must be greater than zero.";
+        public const string ACCOUNT_NOT_FOUND = "Account not found.";
+        #endregion
+
+        #region Member
+        public const string MEMBER_NOT_CREATED = "Member is required.";
+        public const string EMAIL_REQUIRED_MESSAGE = "Email is required.";
+        public const string NAME_REQUIRED_MESSAGE = "Name is required.";
+        public const string EMAIL_FORMAT_REQUIRED= "Invalid email format.";
+        public const string CONTACTNUMBER_FORMAT_REQUIRED = "Contact number is required.";
+        public const string INVALID_PHONE = "Invalid phone number format.";
+        public const string TRANSFER_METHOD_PHONE = "Transfer method is required.";
+        public const string PREFERRED_METHOD_LANGUAGE = "Preferred language is required.";
+        public const string ACCOUNT_NUMBER_REQUIRED = "Account number is required.";
+        public const string ACCOUNT_TYPE_REQURED = "Account type is required.";
+        public const string ROLE_MEMBER_VALUE = "ca603712-4ffc-4e49-8e29-1b1f58bdb713";
+        public const string MEMBER_ADDED_SUCCESSFULLY = "Member Added Successfully";
+        public const string ENTER_VALID_MEMBERID = "Please enter valid MemberId";
         #endregion
     }
 }

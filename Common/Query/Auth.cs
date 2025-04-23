@@ -8,8 +8,6 @@ namespace Common.Query
 {
     public class Auth
     {
-        
-
         public string DoLogin = @"
                 SELECT c.""ContactId"", c.""UserName"", c.""First Name"" AS ""FirstName"", c.""Last Name"" AS ""LastName""
                 FROM ""Contact"" c
@@ -22,17 +20,20 @@ namespace Common.Query
     INSERT INTO ""Contact"" (
         ""MobileNumber"",
         ""SendTransferBy"",
-        ""Nickname"",
+        ""Email"",
+        ""NickName"",
         ""Language"",
-        ""Name""
+        ""First Name""
     )
     VALUES (
         @MobileNumber,
         @SendTransferBy,
+        @Email,
         @Nickname,
         @Language,
         @Name
-    );
+    )
+    RETURNING ""ContactId"";
 ";
 
         public string ContactDetails = @"
@@ -43,7 +44,6 @@ SELECT
     c.""Date of Birth"" AS ""DOB""
 FROM public.""Contact"" c 
 WHERE c.""ContactId"" = @CustomerId";
-
     }
     public class Account
     {
@@ -78,7 +78,8 @@ WHERE c.""ContactId"" = @CustomerId";
         @AccountId,
         @CustomerId,
         @Status
-    );
+    )
+    RETURNING ""CustomerAccountJnId"";
 ";
 
         public string getCustomerAccounts = @"
@@ -122,6 +123,61 @@ WHERE c.""ContactId"" = @CustomerId";
     WHERE t.""Account"" = @AccountId
     ORDER BY t.""CreatedOn"" DESC;
 ";
-    }
 
+        public string checkAccountSql = @"
+    SELECT ""AccountId""
+    FROM ""Account""
+    WHERE ""AccountNumber"" = @AccountNumber;
+";
+
+        public string insertContactRoleJnSql = @"
+    INSERT INTO ""ContactRoleJn"" (
+        ""ContactId"",
+        ""RoleId"",
+        ""MemberId""
+    )
+    VALUES (
+        @ContactId,
+        @RoleId,
+        @MemberId
+    )
+    RETURNING ""ContactRoleJnId""
+";
+
+        public string insertCustomerAccountJnSql = @"
+    INSERT INTO ""CustomerAccountJn"" (
+        ""ContactId"",
+        ""AccountId""
+    )
+    VALUES (   
+        @ContactId,
+        @AccountId
+    );
+";
+
+        public string GetMemberQuery= @"SELECT * FROM public.""ContactRoleJn"" WHERE ""MemberId"" IS NOT NULL AND ""ContactId"" = @ContactId";
+
+        public string GetMemberListOfContact = @"
+SELECT 
+    crj.""MemberId"",
+    c.""First Name"" AS ""FirstName"",
+    c.""Last Name"" AS ""LastName"",
+    c.""Email"",
+    c.""Language"",
+    c.""NickName"",
+    c.""SendTransferBy"",
+    c.""MobileNumber"",
+    a.""AccountNumber"",
+    a.""Name"" AS ""AccountName"",
+    a.""AccountId""
+FROM public.""ContactRoleJn"" crj
+JOIN public.""Contact"" c ON c.""ContactId"" = crj.""MemberId""
+JOIN public.""CustomerAccountJn"" caj ON caj.""Customer"" = c.""ContactId""
+JOIN public.""Account"" a ON a.""AccountId"" = caj.""Account""
+WHERE crj.""MemberId"" IS NOT NULL 
+  AND crj.""ContactId"" = @ContactId;
+";
+
+      
+    }
 }
