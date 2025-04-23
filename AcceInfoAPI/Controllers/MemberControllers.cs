@@ -45,42 +45,25 @@ namespace AcceInfoAPI.Controllers
                 });
             }
             var db = new Common.Helper.DBConnectionHelper(_configuration, _configuration[Common.Models.Constants.DB_CONNECTIONSTRING]);
-            var account = await db.QuerySingleAsync<dynamic>(_masterList.checkAccountSql, new
+            var Member = await db.QuerySingleAsync<dynamic>(_masterList.CheckIfMemberExistbyEmail, new
             {
-                AccountNumber = memberRequest.AccountNumber,
+                Email = memberRequest.Email,
             });
-            string? accountId = account?.AccountId?.ToString();
+            string? MemberId = Member?.ContactId?.ToString();
 
-            if (!string.IsNullOrEmpty(accountId))
+            if (!string.IsNullOrEmpty(MemberId))
             {
                 using var conn = await db.GetOpenConnectionAsync();
                 using var trx = conn.BeginTransaction();
                 var contactId = _httpContextAccessor.HttpContext?.User?.FindFirst("contactId")?.Value;
-                string MemberId = string.Empty, ContactRoleJnId = string.Empty, contactAccountJnId = string.Empty;
+                string ContactRoleJnId = string.Empty;
                 try
                 {
-                    MemberId = await conn.ExecuteScalarAsync<string>(_auth.insertContactSql, new
-                    {
-                        MobileNumber = memberRequest.ContactNumber,
-                        SendTransferBy = memberRequest.TransferMethod,
-                        Email = memberRequest.Email,
-                        Nickname = memberRequest.NickName,
-                        Language = memberRequest.PrefLanguage,
-                        Name = memberRequest.Name
-                    }, trx);
-
                     ContactRoleJnId = await conn.ExecuteScalarAsync<string>(_masterList.insertContactRoleJnSql, new
                     {
                         ContactId = contactId,
                         RoleId = Constants.ROLE_MEMBER_VALUE,
                         MemberId = MemberId
-                    }, trx);
-
-                    contactAccountJnId = await conn.ExecuteScalarAsync<string>(_masterList.insertCustomerAccountSql, new
-                    {
-                        AccountId = accountId,
-                        CustomerId = MemberId,
-                        Status = true,
                     }, trx);
 
                     await trx.CommitAsync();
@@ -95,12 +78,6 @@ namespace AcceInfoAPI.Controllers
                 catch (Exception ex)
                 {
                     await trx.RollbackAsync();
-
-                    if (!string.IsNullOrEmpty(MemberId))
-                    {
-                        await conn.ExecuteAsync(@"DELETE FROM ""Contact"" WHERE ""ContactId"" = @Id", new { Id = MemberId });
-                    }
-
                     return BadRequest(new Common.Models.ResponseModel
                     {
                         Status = Constants.FAILED_STATUS,

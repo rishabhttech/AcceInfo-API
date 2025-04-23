@@ -194,6 +194,8 @@ WHERE crj.""MemberId"" IS NOT NULL
     COMMIT;
 ";
 
+        public string CheckIfMemberExistbyEmail = @"SELECT ""ContactId"" FROM public.""Contact"" WHERE ""Email"" = @Email";
+
 
     }
 }
