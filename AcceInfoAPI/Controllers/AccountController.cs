@@ -281,6 +281,14 @@ namespace AcceInfoAPI.Controllers
                 });
                 if (AccountBalanceQueryList.Count() != 0 && ((decimal)AccountBalanceQueryList.ToList()[0].Balance) >= request.Amount)
                 {
+                    var result = await db.QuerySingleAsync<dynamic>(_masterList.TransferbyAccount, new
+                    {
+                        AccountNumberFrom = request.AccountNumberFrom,
+                        AccountNumberTo = request.AccountNumberTo,
+                        Amount = request.Amount,
+                        Note = request.Note
+                    });
+
                     int rowsAffected = await db.ExecuteAsync(_masterList.TransferbyAccount, new
                     {
                         AccountNumberFrom = request.AccountNumberFrom,
