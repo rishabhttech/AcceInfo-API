@@ -234,7 +234,8 @@ INSERT INTO public.""Recipient"" (
     ""IstransferByEmail"",
     ""IstransferByMobile"",
     ""PrefLanguage"",
-    ""NickName""
+    ""NickName"",
+    ""Contact""
 )
 VALUES (
     @Name,
@@ -243,7 +244,8 @@ VALUES (
     @IstransferByEmail,
     @IstransferByMobile,
     @PrefLanguage,
-    @NickName
+    @NickName,
+    @Contact
 )
 RETURNING ""RecipientId"";
 ";
