@@ -9,19 +9,12 @@ namespace Common.Query
     public class Auth
     {
         public string DoLogin = @"
-    SELECT 
-        c.""ContactId"", 
-        c.""UserName"", 
-        c.""First Name"" AS ""FirstName"", 
-        c.""Last Name"" AS ""LastName""
-    FROM ""Contact"" c
-    JOIN ""ContactRoleJn"" crj ON c.""ContactId"" = crj.""ContactId""
-    JOIN ""Roles"" r ON crj.""RoleId"" = r.""RoleId""
-    WHERE 
-        (c.""UserName"" = @UserName OR c.""CardNumber"" = @UserName)
-        AND c.""Password"" = @Password 
-        AND LOWER(r.""Name"") = @Role;
-";
+                SELECT c.""ContactId"", c.""UserName"", c.""First Name"" AS ""FirstName"", c.""Last Name"" AS ""LastName""
+                FROM ""Contact"" c
+                JOIN ""ContactRoleJn"" crj ON c.""ContactId"" = crj.""ContactId""
+                JOIN ""Roles"" r ON crj.""RoleId"" = r.""RoleId""
+                WHERE c.""UserName"" = @UserName AND c.""Password"" = @Password AND LOWER(r.""Name"") = @Role
+                ";
 
         public string insertContactSql = @"
     INSERT INTO ""Contact"" (
@@ -198,86 +191,145 @@ WHERE crj.""ContactId"" = @ContactId
 
 
         public string TransferAccountInfo = @"
-    SELECT ""Balance""
-    FROM ""Account""
-    WHERE ""AccountId"" = @AccountNumberFrom;
+        SELECT ""Balance""
+        FROM ""Account""
+        WHERE ""AccountId"" = @AccountNumberFrom;
+    ";
+
+        public string TransferbyAccount = @"
+BEGIN;
+ 
+     INSERT INTO ""Transactions"" (
+         ""TransactionFrom"",
+         ""TransactionTo"",
+         ""Amount"",
+         ""Currency"",
+         ""IsSelfTransfer"",
+         ""Frequency"",
+         ""Note"",
+         ""StartDate"",
+        ""EndDate""
+     ) 
+     VALUES (
+         @AccountNumberFrom,
+         @AccountNumberTo,
+         @Amount,
+        @Currency,
+        @IsSelfTransfer,
+        @Frequency,
+         @Note,
+         @StartDate,
+        @EndDate
+     )
+     RETURNING 
+     ""TransactionId"", 
+     ""CreatedOn"", 
+     @AccountNumberFrom AS ""AccountNumberFrom"", 
+     @AccountNumberTo AS ""AccountNumberTo"", 
+     @Amount AS ""Amount"", 
+     @Currency AS ""Currency"",
+     @IsSelfTransfer AS ""IsSelfTransfer"",
+     @Frequency AS ""Frequency"",
+     @Note AS ""Note"",
+     @StartDate AS ""StartDate"",
+     @EndDate AS ""EndDate""
+    ;
+ 
+
+     UPDATE ""Account""
+     SET ""Balance"" = ""Balance"" - @Amount
+     WHERE ""AccountId"" = @AccountNumberFrom;
+ 
+     UPDATE ""Account""
+     SET ""Balance"" = ""Balance"" + @Amount
+     WHERE ""AccountId"" = @AccountNumberTo;
+ 
+ 
+COMMIT;
 ";
 
-            public string TransferbyAccount = @"
-        BEGIN;
+        public string PayBill = @"
+BEGIN;
+ 
+     INSERT INTO ""Transactions"" (
+         ""TransactionFrom"",
+         ""TransactionTo"",
+         ""Amount"",
+         ""Currency"",
+         ""Frequency"",
+         ""Note"",
+         ""StartDate"",
+        ""EndDate""
+     ) 
+     VALUES (
+         @AccountNumberFrom,
+         @AccountNumberTo,
+         @Amount,
+        @Currency,
+        @Frequency,
+         @Note,
+         @StartDate,
+        @EndDate
+     )
+     RETURNING 
+     ""TransactionId"", 
+     ""CreatedOn"", 
+     @AccountNumberFrom AS ""AccountNumberFrom"", 
+     @AccountNumberTo AS ""AccountNumberTo"", 
+     @Amount AS ""Amount"", 
+     @Currency AS ""Currency"",
+     @Frequency AS ""Frequency"",
+     @Note AS ""Note"",
+     @StartDate AS ""StartDate"",
+     @EndDate AS ""EndDate""
+    ;
+ 
 
-            INSERT INTO ""Transactions"" (
-                ""TransactionFrom"",
-                ""TransactionTo"",
-                ""Amount"",
-                ""Note""
-            ) 
-            VALUES (
-                @AccountNumberFrom,
-                @AccountNumberTo,
-                @Amount,
-                @Note
-            )
-
-RETURNING 
-        ""TransactionId"", 
-        ""CreatedOn"", 
-        @AccountNumberFrom AS ""AccountNumberFrom"", 
-        @AccountNumberTo AS ""AccountNumberTo"", 
-        @Amount AS ""Amount"", 
-        @Note AS ""Note"";
-        
-            UPDATE ""Account""
-            SET ""Balance"" = ""Balance"" - @Amount
-            WHERE ""AccountId"" = @AccountNumberFrom;
-
-            UPDATE ""Account""
-            SET ""Balance"" = ""Balance"" + @Amount
-            WHERE ""AccountId"" = @AccountNumberTo;
-
-
-
-        COMMIT;
+     UPDATE ""Account""
+     SET ""Balance"" = ""Balance"" - @Amount
+     WHERE ""AccountId"" = @AccountNumberFrom;
+ 
+COMMIT;
 ";
 
         public string CheckIfMemberExistbyEmail = @"SELECT ""ContactId"" FROM public.""Contact"" WHERE ""Email"" = @Email";
         public string insertRecipientSql = @"
-INSERT INTO public.""Recipient"" (
-    ""Name"",
-    ""Email"",
-    ""ContactNumber"",
-    ""IstransferByEmail"",
-    ""IstransferByMobile"",
-    ""PrefLanguage"",
-    ""NickName"",
-    ""Contact""
-)
-VALUES (
-    @Name,
-    @Email,
-    @ContactNumber,
-    @IstransferByEmail,
-    @IstransferByMobile,
-    @PrefLanguage,
-    @NickName,
-    @Contact
-)
-RETURNING ""RecipientId"";
-";
+        INSERT INTO public.""Recipient"" (
+            ""Name"",
+            ""Email"",
+            ""ContactNumber"",
+            ""IstransferByEmail"",
+            ""IstransferByMobile"",
+            ""PrefLanguage"",
+            ""NickName"",
+            ""Contact""
+        )
+        VALUES (
+            @Name,
+            @Email,
+            @ContactNumber,
+            @IstransferByEmail,
+            @IstransferByMobile,
+            @PrefLanguage,
+            @NickName,
+            @Contact
+        )
+        RETURNING ""RecipientId"";
+        ";
 
-        public string AddPayeeQuery = @"
-INSERT INTO public.""Payee"" (
-    ""Payee Name"",
-    ""Payee Number"",
-    ""PayeeType"",
-    ""ContactId""
-)
-VALUES (
-    @PayeeName,
-    @PayeeNumber,
-    @PayeeType,
-    @ContactId
-)
-RETURNING ""PayeeId"";";
+                public string AddPayeeQuery = @"
+        INSERT INTO public.""Payee"" (
+            ""Payee Name"",
+            ""Payee Number"",
+            ""PayeeType"",
+            ""ContactId""
+        )
+        VALUES (
+            @PayeeName,
+            @PayeeNumber,
+            @PayeeType,
+            @ContactId
+        )
+        RETURNING ""PayeeId"";";
     }
 }

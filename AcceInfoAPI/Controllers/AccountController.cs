@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 
 namespace AcceInfoAPI.Controllers
@@ -281,38 +282,39 @@ namespace AcceInfoAPI.Controllers
                 });
                 if (AccountBalanceQueryList.Count() != 0 && ((decimal)AccountBalanceQueryList.ToList()[0].Balance) >= request.Amount)
                 {
-                    var result = await db.QuerySingleAsync<dynamic>(_masterList.TransferbyAccount, new
+                    var rowsAffected = await db.ExecuteAsync(_masterList.TransferbyAccount, new
                     {
                         AccountNumberFrom = request.AccountNumberFrom,
                         AccountNumberTo = request.AccountNumberTo,
                         Amount = request.Amount,
-                        Note = request.Note
+                        Currency = request.Currency,
+                        IsSelfTransfer = request.IsSelfTransfer,
+                        Frequency = request.Frequency,
+                        Note = request.Note,
+                        StartDate = request.StartDate,
+                        EndDate =  request.EndDate
                     });
 
-                    int rowsAffected = await db.ExecuteAsync(_masterList.TransferbyAccount, new
+                   
+                    if (rowsAffected != null && rowsAffected > 0)
                     {
-                        AccountNumberFrom = request.AccountNumberFrom,
-                        AccountNumberTo = request.AccountNumberTo,
-                        Amount = request.Amount,
-                        Note = request.Note
-                    });
-                    if (rowsAffected > 0)
-                    {
-                        var transferResult = new TransferResponse
+                        var result = await db.QuerySingleAsync<dynamic>(_masterList.TransferbyAccount, new
                         {
                             AccountNumberFrom = request.AccountNumberFrom,
                             AccountNumberTo = request.AccountNumberTo,
                             Amount = request.Amount,
-                            Note = request.Note
-
-                        };
-
-
+                            Currency = request.Currency,
+                            IsSelfTransfer = request.IsSelfTransfer,
+                            Frequency = request.Frequency,
+                            Note = request.Note,
+                            StartDate = request.StartDate,
+                            EndDate = request.EndDate
+                        });
 
                         return Ok(new
                         {
                             Status = Constants.SUCCESS_STATUS,
-                            Data = transferResult
+                            Data = result
                         });
                     }
                     else
@@ -342,6 +344,72 @@ namespace AcceInfoAPI.Controllers
                 });
             }
         }
+
+        [Authorize]
+        [HttpPost("PayBill")]
+        public async Task<IActionResult> PayBill([FromBody] PayBillRequest request)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(request.AccountNumberFrom))
+                {
+                    return BadRequest(new
+                    {
+                        Status = Constants.ERROR_STATUS,
+                        Message = "AccountNumber From is required."
+                    });
+                }
+
+                var db = new DBConnectionHelper(_configuration, _configuration[Constants.DB_CONNECTIONSTRING]);
+
+                var AccountBalanceQuery = (await db.QueryAsync<dynamic>(_masterList.TransferAccountInfo, new { AccountNumberFrom = request.AccountNumberFrom })).ToList();
+                var AccountBalanceQueryList = AccountBalanceQuery.Select(x => new
+                {
+                    Balance = (double)x.Balance,
+                });
+                decimal sumOfBalance = request.ToAccountNumbers.Sum(_ => _.Amount);
+                
+                if (AccountBalanceQueryList.Count() != 0 && ((decimal)AccountBalanceQueryList.ToList()[0].Balance) >= sumOfBalance)
+                {
+                    foreach (var bal in request.ToAccountNumbers)
+                    {
+                        var rowsAffected = await db.ExecuteAsync(_masterList.PayBill, new
+                        {
+                            AccountNumberFrom = request.AccountNumberFrom,
+                            AccountNumberTo = bal.AccountNumberTo,
+                            Amount = bal.Amount,
+                            Currency = bal.Currency,
+                            Frequency = bal.Frequency,
+                            Note = bal.Memo,
+                            StartDate = bal.StartDate,
+                            EndDate = bal.EndDate
+                        });
+                    }
+                }
+                else
+                {
+                    return StatusCode(200, new
+                    {
+                        Status = Constants.FAILED_STATUS,
+                        Message = "insufficient balance"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Status = Constants.FAILED_STATUS,
+                    Message = "An error occurred while transferring money.",
+                    Error = ex.Message
+                });
+            }
+            return Ok(new
+            {
+                Status = Constants.SUCCESS_STATUS,
+                Data = request
+            });
+        }
 
         public IActionResult Index()
         {
