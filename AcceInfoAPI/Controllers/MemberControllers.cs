@@ -67,7 +67,8 @@ namespace AcceInfoAPI.Controllers
                         IstransferByEmail = memberRequest.IstransferByEmail,
                         IstransferByMobile = memberRequest.IstransferByMobile,
                         PrefLanguage = memberRequest.PrefLanguage,
-                        NickName = memberRequest.NickName
+                        NickName = memberRequest.NickName,
+                        Contact = contactId
                     }, trx);
 
 
