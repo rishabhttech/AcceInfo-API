@@ -156,25 +156,36 @@ WHERE c.""ContactId"" = @CustomerId";
 
         public string GetMemberQuery= @"SELECT * FROM public.""ContactRoleJn"" WHERE ""MemberId"" IS NOT NULL AND ""ContactId"" = @ContactId";
 
+        public string GetPayeeCategoriesQuery = @"SELECT * FROM public.""PayeeType"" ORDER BY ""Name"" ASC;";
+        public string GetPayeeByContact = @"SELECT  ""PayeeId"",
+    ""Payee Name"" AS ""PayeeName"",
+    ""Payee Number"" AS ""PayeeNumber"",
+    ""PayeeType"",
+    ""PayeeId""
+    ""ContactId""
+FROM public.""Payee""
+WHERE ""ContactId"" = @ContactId;";
+
         public string GetMemberListOfContact = @"
 SELECT 
-    crj.""MemberId"",
-    c.""First Name"" AS ""FirstName"",
-    c.""Last Name"" AS ""LastName"",
-    c.""Email"",
-    c.""Language"",
-    c.""NickName"",
-    c.""SendTransferBy"",
-    c.""MobileNumber"",
+    r.""RecipientId"",
+    r.""Name"",
+    r.""Email"",
+    r.""ContactNumber"",
+    r.""NickName"",
+    r.""PrefLanguage"",
+    r.""CreatedOn"",
+    a.""AccountId"",
     a.""AccountNumber"",
-    a.""Name"" AS ""AccountName"",
-    a.""AccountId""
+    a.""Balance""
 FROM public.""ContactRoleJn"" crj
-JOIN public.""Contact"" c ON c.""ContactId"" = crj.""MemberId""
-JOIN public.""CustomerAccountJn"" caj ON caj.""Customer"" = c.""ContactId""
+JOIN public.""Recipient"" r ON r.""RecipientId"" = crj.""MemberId""
+JOIN public.""CustomerAccountJn"" caj ON caj.""Customer"" = r.""Contact""
 JOIN public.""Account"" a ON a.""AccountId"" = caj.""Account""
-WHERE crj.""MemberId"" IS NOT NULL 
-  AND crj.""ContactId"" = @ContactId;
+JOIN public.""AccountCategory"" ac ON ac.""AccountCategoryId"" = a.""AccountCategory""
+WHERE crj.""ContactId"" = @ContactId
+  AND crj.""MemberId"" IS NOT NULL
+  AND ac.""Name"" = 'Spending (Chequing)';
 ";
 
 
@@ -194,7 +205,41 @@ WHERE crj.""MemberId"" IS NOT NULL
 ";
 
         public string CheckIfMemberExistbyEmail = @"SELECT ""ContactId"" FROM public.""Contact"" WHERE ""Email"" = @Email";
+        public string insertRecipientSql = @"
+INSERT INTO public.""Recipient"" (
+    ""Name"",
+    ""Email"",
+    ""ContactNumber"",
+    ""IstransferByEmail"",
+    ""IstransferByMobile"",
+    ""PrefLanguage"",
+    ""NickName""
+)
+VALUES (
+    @Name,
+    @Email,
+    @ContactNumber,
+    @IstransferByEmail,
+    @IstransferByMobile,
+    @PrefLanguage,
+    @NickName
+)
+RETURNING ""RecipientId"";
+";
 
-
+        public string AddPayeeQuery = @"
+INSERT INTO public.""Payee"" (
+    ""Payee Name"",
+    ""Payee Number"",
+    ""PayeeType"",
+    ""ContactId""
+)
+VALUES (
+    @PayeeName,
+    @PayeeNumber,
+    @PayeeType,
+    @ContactId
+)
+RETURNING ""PayeeId"";";
     }
 }

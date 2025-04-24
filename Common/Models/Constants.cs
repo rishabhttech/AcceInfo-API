@@ -17,6 +17,7 @@ namespace Common.Models
         public static readonly string FAILED_STATUS = "Failed";
         public static readonly string ERROR_STATUS = "An Error Occured";
         public static readonly string DATA_FOUND_SUCCESSFULLY = "Data found Successfully";
+        public static readonly string DATA_NOT_FOUND = "Data not found";
 
         public static readonly string LOGIN_SUCCESSFULLY = "Login Successfull";
         public static readonly string LOGIN_FAILED = "Login Failed";
@@ -55,6 +56,12 @@ namespace Common.Models
         public const string ROLE_MEMBER_VALUE = "ca603712-4ffc-4e49-8e29-1b1f58bdb713";
         public const string MEMBER_ADDED_SUCCESSFULLY = "Member Added Successfully";
         public const string ENTER_VALID_MEMBERID = "Please enter valid MemberId";
+        #endregion
+
+        #region Payee
+        public const string PAYEE_NAME_REQUIRE = "Payee Name is required.";
+        public const string PAYEE_NUMBER_REQUIRE = "Payee Number is required.";
+        public const string PAYEE_TYPE_REQUIRE = "Payee Type is required.";
         #endregion
     }
 }

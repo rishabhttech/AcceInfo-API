@@ -26,8 +26,5 @@ namespace Common.Models.Request
 
         [Required(ErrorMessage = Constants.PREFERRED_METHOD_LANGUAGE)]
         public string PrefLanguage { get; set; }
-        public string SecurityQuestion { get; set; }
-        public string SecurityAnswer { get; set; }
-
     }
 }
