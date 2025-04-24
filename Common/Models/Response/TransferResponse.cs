@@ -11,6 +11,8 @@ namespace Common.Models.Response
         public string AccountNumberFrom { get; set; }
         public string AccountNumberTo { get; set; }
         public decimal Amount { get; set; }
+        public string Note { get; set; }
+        public DateTime CreatedOn { get; set; }
     }
 
 
