@@ -190,19 +190,39 @@ WHERE crj.""ContactId"" = @ContactId
 ";
 
 
+        public string TransferAccountInfo = @"
+    SELECT ""Balance""
+    FROM ""Account""
+    WHERE ""AccountId"" = @AccountNumberFrom;
+";
 
-        public string TransferbyAccount = @"
-    BEGIN;
+            public string TransferbyAccount = @"
+        BEGIN;
 
-    UPDATE ""Account""
-    SET ""Balance"" = ""Balance"" - @Amount
-    WHERE ""AccountNumber"" = @AccountNumberFrom;
+            INSERT INTO ""Transactions"" (
+                ""TransactionFrom"",
+                ""TransactionTo"",
+                ""Amount"",
+                ""Note""
+            ) 
+            VALUES (
+                @AccountNumberFrom,
+                @AccountNumberTo,
+                @Amount,
+                @Note
+            );
+        
+            UPDATE ""Account""
+            SET ""Balance"" = ""Balance"" - @Amount
+            WHERE ""AccountId"" = @AccountNumberFrom;
 
-    UPDATE ""Account""
-    SET ""Balance"" = ""Balance"" + @Amount
-    WHERE ""AccountNumber"" = @AccountNumberTo;
+            UPDATE ""Account""
+            SET ""Balance"" = ""Balance"" + @Amount
+            WHERE ""AccountId"" = @AccountNumberTo;
 
-    COMMIT;
+
+
+        COMMIT;
 ";
 
         public string CheckIfMemberExistbyEmail = @"SELECT ""ContactId"" FROM public.""Contact"" WHERE ""Email"" = @Email";
