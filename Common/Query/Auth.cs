@@ -169,6 +169,8 @@ WHERE ""ContactId"" = @ContactId;";
         public string GetMemberListOfContact = @"
 SELECT 
     r.""RecipientId"",
+    r.""IstransferByEmail"",
+    r.""IstransferByMobile"",
     r.""Name"",
     r.""Email"",
     r.""ContactNumber"",
@@ -184,8 +186,7 @@ JOIN public.""CustomerAccountJn"" caj ON caj.""Customer"" = r.""Contact""
 JOIN public.""Account"" a ON a.""AccountId"" = caj.""Account""
 JOIN public.""AccountCategory"" ac ON ac.""AccountCategoryId"" = a.""AccountCategory""
 WHERE crj.""ContactId"" = @ContactId
-  AND crj.""MemberId"" IS NOT NULL
-  AND ac.""Name"" = 'Spending (Chequing)';
+  AND crj.""MemberId"" IS NOT NULL;
 ";
 
 

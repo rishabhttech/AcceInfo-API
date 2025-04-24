@@ -103,7 +103,7 @@ namespace AcceInfoAPI.Controllers
                 return Ok(new Common.Models.ResponseModel
                 {
                     statusCode = HttpStatusCode.OK,
-                    Status = Constants.SUCCESS_STATUS,
+                    Status = Constants.FAILED_STATUS,
                     Message = Constants.ACCOUNT_NOT_FOUND
                 });
             }
@@ -120,6 +120,8 @@ namespace AcceInfoAPI.Controllers
                 var AccountTypeListQueryList = AccountTypeListQuery.Select(x => new 
                 {
                     Name = (string)x.Name,
+                    IstransferByEmail = (bool)x.IstransferByEmail,
+                    IstransferByMobile = (bool)x.IstransferByMobile,
                     Email = (string)x.Email,
                     PreferredLanguage = (string)x.PrefLanguage,
                     NickName = (string)x.NickName,
