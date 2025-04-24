@@ -274,42 +274,55 @@ namespace AcceInfoAPI.Controllers
 
                 var db = new DBConnectionHelper(_configuration, _configuration[Constants.DB_CONNECTIONSTRING]);
 
+                var AccountBalanceQuery = (await db.QueryAsync<dynamic>(_masterList.TransferAccountInfo, new { AccountNumberFrom = request.AccountNumberFrom })).ToList();
+                var AccountBalanceQueryList = AccountBalanceQuery.Select(x => new
+                {
+                    Balance = (double)x.Balance,
+                });
+                if (AccountBalanceQueryList.Count() != 0 && ((decimal)AccountBalanceQueryList.ToList()[0].Balance) >= request.Amount)
+                {
+                    int rowsAffected = await db.ExecuteAsync(_masterList.TransferbyAccount, new
+                    {
+                        AccountNumberFrom = request.AccountNumberFrom,
+                        AccountNumberTo = request.AccountNumberTo,
+                        Amount = request.Amount,
+                        Note = request.Note
+                    });
+                    if (rowsAffected > 0)
+                    {
+                        var transferResult = new TransferResponse
+                        {
+                            AccountNumberFrom = request.AccountNumberFrom,
+                            AccountNumberTo = request.AccountNumberTo,
+                            Amount = request.Amount,
+                            Note = request.Note
+
+                        };
 
 
-                int rowsAffected = await db.ExecuteAsync(_masterList.TransferbyAccount, new
-                {
-                    AccountNumberFrom = request.AccountNumberFrom,
-                    AccountNumberTo = request.AccountNumberTo,
-                    Amount = request.Amount,
-                });
 
-
-
-                if (rowsAffected > 0)
-                {
-                    var transferResult = new TransferResponse
-                    {
-                        AccountNumberFrom = request.AccountNumberFrom,
-                        AccountNumberTo = request.AccountNumberTo,
-                        Amount = request.Amount,
-                    };
-
-
-
-                    return Ok(new
-                    {
-                        Status = Constants.SUCCESS_STATUS,
-                        Data = transferResult
-                    });
-                }
-                else
-                {
-                    return StatusCode(500, new
-                    {
-                        Status = Constants.FAILED_STATUS,
-                        Message = "Transfer failed. No rows affected."
-                    });
-                }
+                        return Ok(new
+                        {
+                            Status = Constants.SUCCESS_STATUS,
+                            Data = transferResult
+                        });
+                    }
+                    else
+                    {
+                        return StatusCode(200, new
+                        {
+                            Status = Constants.FAILED_STATUS,
+                            Message = "Transfer failed. No rows affected."
+                        });
+                    }
+                }
+                else {
+                    return StatusCode(200, new
+                    {
+                        Status = Constants.FAILED_STATUS,
+                        Message = "insufficient balance"
+                    });
+                } 
             }
             catch (Exception ex)
             {

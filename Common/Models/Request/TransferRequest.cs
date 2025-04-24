@@ -11,10 +11,15 @@ namespace Common.Models.Request
     {
         [Required(ErrorMessage = Constants.ACCOUNT_AccountName_REQUIRED)]
         public string AccountNumberTo { get; set; }
+
         [Required(ErrorMessage = Constants.ACCOUNT_AccountName_REQUIRED)]
         public string AccountNumberFrom { get; set; }
+
         [Required(ErrorMessage = Constants.ACCOUNT_Amount_REQUIRED)]
         [Range(0.01, double.MaxValue, ErrorMessage = Constants.ACCOUNT_VALID_AMOUNT_ERROR)]
         public decimal Amount { get; set; }
+
+        public string Note { get; set; }
     }
+
 }

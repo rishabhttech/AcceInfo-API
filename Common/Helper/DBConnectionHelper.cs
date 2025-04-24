@@ -40,5 +40,6 @@ namespace Common.Helper
             await conn.OpenAsync();
             return conn;
         }
+
     }
 }
