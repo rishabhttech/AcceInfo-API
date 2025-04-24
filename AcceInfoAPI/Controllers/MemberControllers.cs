@@ -56,14 +56,26 @@ namespace AcceInfoAPI.Controllers
                 using var conn = await db.GetOpenConnectionAsync();
                 using var trx = conn.BeginTransaction();
                 var contactId = _httpContextAccessor.HttpContext?.User?.FindFirst("contactId")?.Value;
-                string ContactRoleJnId = string.Empty;
+                string ContactRoleJnId = string.Empty, ReceipientId = string.Empty;
                 try
                 {
+                    ReceipientId = await conn.ExecuteScalarAsync<string>(_masterList.insertRecipientSql, new
+                    {
+                        Name = memberRequest.Name,
+                        Email = memberRequest.Email,
+                        ContactNumber = memberRequest.ContactNumber,
+                        IstransferByEmail = memberRequest.IstransferByEmail,
+                        IstransferByMobile = memberRequest.IstransferByMobile,
+                        PrefLanguage = memberRequest.PrefLanguage,
+                        NickName = memberRequest.NickName
+                    }, trx);
+
+
                     ContactRoleJnId = await conn.ExecuteScalarAsync<string>(_masterList.insertContactRoleJnSql, new
                     {
                         ContactId = contactId,
                         RoleId = Constants.ROLE_MEMBER_VALUE,
-                        MemberId = MemberId
+                        MemberId = ReceipientId
                     }, trx);
 
                     await trx.CommitAsync();
@@ -91,7 +103,7 @@ namespace AcceInfoAPI.Controllers
                 return Ok(new Common.Models.ResponseModel
                 {
                     statusCode = HttpStatusCode.OK,
-                    Status = Constants.SUCCESS_STATUS,
+                    Status = Constants.FAILED_STATUS,
                     Message = Constants.ACCOUNT_NOT_FOUND
                 });
             }
@@ -107,13 +119,13 @@ namespace AcceInfoAPI.Controllers
                 var AccountTypeListQuery = (await db.QueryAsync<dynamic>(_masterList.GetMemberListOfContact, new { ContactId = contactId })).ToList();
                 var AccountTypeListQueryList = AccountTypeListQuery.Select(x => new 
                 {
-                    FirstName = (string)x.FirstName,
-                    LastName = (string)x.LastName,
+                    Name = (string)x.Name,
+                    IstransferByEmail = (bool)x.IstransferByEmail,
+                    IstransferByMobile = (bool)x.IstransferByMobile,
                     Email = (string)x.Email,
-                    PreferredLanguage = (string)x.Language,
+                    PreferredLanguage = (string)x.PrefLanguage,
                     NickName = (string)x.NickName,
-                    SendTransferedBy = (string)x.SendTransferBy,
-                    MobileNumber = (string)x.MobileNumber,
+                    MobileNumber = (string)x.ContactNumber,
                     AccountNumber = (string)x.AccountNumber,
                     MemberId = (string)x.MemberId,
                     AccountId = (string)x.AccountId,
@@ -134,8 +146,104 @@ namespace AcceInfoAPI.Controllers
                     Status = Constants.FAILED_STATUS,
                     Message = Constants.ENTER_VALID_MEMBERID
                 });
+            } 
+        }
+        [Authorize]
+        [HttpGet("get-payeecategories")]
+        public async Task<IActionResult> GetPayeeCategories()
+        {
+            var db = new Common.Helper.DBConnectionHelper(_configuration, _configuration[Common.Models.Constants.DB_CONNECTIONSTRING]);
+            var GetPayeeCategoryQuery = (await db.QueryAsync<dynamic>(_masterList.GetPayeeCategoriesQuery)).ToList();
+            var PayeeCategoryListQueryList = GetPayeeCategoryQuery.Select(x => new
+            {
+                Name = (string)x.Name,
+                PayeeTypeId = (string)x.PayeeTypeId
+            });
+
+            return Ok(
+                new Common.Models.ResponseModel
+                {
+                    statusCode = HttpStatusCode.OK,
+                    Status = Constants.SUCCESS_STATUS,
+                    Data = PayeeCategoryListQueryList,
+                    Message = Constants.DATA_FOUND_SUCCESSFULLY
+                });
+        }
+        [Authorize]
+        [HttpPost("payee-add")]
+        public async Task<IActionResult> AddPayee([FromBody] Common.Models.Request.AddPayeeRequest payeeRequest)
+        {
+            var db = new Common.Helper.DBConnectionHelper(_configuration, _configuration[Common.Models.Constants.DB_CONNECTIONSTRING]);
+            using var conn = await db.GetOpenConnectionAsync();
+            using var trx = conn.BeginTransaction();
+            var contactId = _httpContextAccessor.HttpContext?.User?.FindFirst("contactId")?.Value;
+            var ContactRoleJnId = await conn.ExecuteScalarAsync<string>(_masterList.AddPayeeQuery, new
+            {
+                PayeeName = payeeRequest.PayeeName,
+                PayeeNumber = payeeRequest.PayeeNumber,
+                PayeeType = payeeRequest.PayeeType,
+                ContactId = contactId
+            }, trx);
+
+            await trx.CommitAsync();
+
+            return Ok(
+                new Common.Models.ResponseModel
+                {
+                    statusCode = HttpStatusCode.OK,
+                    Status = Constants.SUCCESS_STATUS,
+                    Data = ContactRoleJnId,
+                    Message = Constants.DATA_FOUND_SUCCESSFULLY
+                });
+        }
+        [Authorize]
+        [HttpGet("getpayeelist")]
+        public async Task<IActionResult> GetPayeeByContact()
+        {
+            try
+            {
+                var db = new Common.Helper.DBConnectionHelper(_configuration, _configuration[Common.Models.Constants.DB_CONNECTIONSTRING]);
+                var contactId = _httpContextAccessor.HttpContext?.User?.FindFirst("contactId")?.Value;
+                var GetPayeeListQuery = (await db.QueryAsync<dynamic>(_masterList.GetPayeeByContact, new { ContactId = contactId })).ToList();
+                var PayeeListQueryList = GetPayeeListQuery.Select(x => new
+                {
+                    PayeeName = (string)x.PayeeName,
+                    PayeeNumber = (string)x.PayeeNumber,
+                    PayeeType = (string)x.PayeeType,
+                    PayeeId = (string)x.PayeeId,
+                });
+                if (PayeeListQueryList != null && PayeeListQueryList.Count() > 0)
+                {
+                    return Ok(
+                    new Common.Models.ResponseModel
+                    {
+                        statusCode = HttpStatusCode.OK,
+                        Status = Constants.SUCCESS_STATUS,
+                        Data = PayeeListQueryList,
+                        Message = Constants.DATA_FOUND_SUCCESSFULLY
+                    });
+                }
+                else
+                {
+                    return Ok(
+                    new Common.Models.ResponseModel
+                    {
+                        statusCode = HttpStatusCode.OK,
+                        Status = Constants.SUCCESS_STATUS,
+                        Message = Constants.DATA_NOT_FOUND
+                    });
+                }
             }
-                return Ok();
+            catch(Exception ex)
+            {
+                return Ok(
+                    new Common.Models.ResponseModel
+                    {
+                        statusCode = HttpStatusCode.InternalServerError,
+                        Status = Constants.FAILED_STATUS,
+                        Message = Constants.ERROR_STATUS
+                    });
+            }
         }
 
         public IActionResult Index()

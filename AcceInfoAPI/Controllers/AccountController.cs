@@ -61,7 +61,7 @@ namespace AcceInfoAPI.Controllers
                     AccountCategory = request.AccountType,
                     Name = request.AccountName
                 }, trx);
-                var contactAccountJnId = await conn.ExecuteScalarAsync<Guid>(_account.insertCustomerAccountSql, new
+                var contactAccountJnId = await conn.ExecuteScalarAsync<string>(_account.insertCustomerAccountSql, new
                 {
                     AccountId = accountId,
                     CustomerId = request.ContactId,
