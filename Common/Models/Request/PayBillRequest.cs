@@ -35,6 +35,7 @@ namespace Common.Models.Request
         [Required(ErrorMessage = Constants.ACCOUNT_AccountName_REQUIRED)]
         public DateTime EndDate { get; set; }
         public string Memo { get; set; }
+        public string TransactionNumber { get; set; }
 
     }
 }

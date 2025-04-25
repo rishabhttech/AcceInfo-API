@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
+using System.Transactions;
 
 
 namespace AcceInfoAPI.Controllers
@@ -176,7 +177,7 @@ namespace AcceInfoAPI.Controllers
         }
 
         [Authorize]
-        [HttpGet("transaction-history")]
+        [HttpPost("transaction-history")]
         public async Task<IActionResult> GetTransactionHistoryByAccountId([FromBody] TransactionHistoryRequest request)
         {
             try
@@ -282,49 +283,27 @@ namespace AcceInfoAPI.Controllers
                 });
                 if (AccountBalanceQueryList.Count() != 0 && ((decimal)AccountBalanceQueryList.ToList()[0].Balance) >= request.Amount)
                 {
-                    var rowsAffected = await db.ExecuteAsync(_masterList.TransferbyAccount, new
-                    {
-                        AccountNumberFrom = request.AccountNumberFrom,
-                        AccountNumberTo = request.AccountNumberTo,
-                        Amount = request.Amount,
-                        Currency = request.Currency,
-                        IsSelfTransfer = request.IsSelfTransfer,
-                        Frequency = request.Frequency,
-                        Note = request.Note,
-                        StartDate = request.StartDate,
-                        EndDate =  request.EndDate
-                    });
-
-                   
-                    if (rowsAffected != null && rowsAffected > 0)
-                    {
-                        var result = await db.QuerySingleAsync<dynamic>(_masterList.TransferbyAccount, new
-                        {
-                            AccountNumberFrom = request.AccountNumberFrom,
-                            AccountNumberTo = request.AccountNumberTo,
-                            Amount = request.Amount,
-                            Currency = request.Currency,
-                            IsSelfTransfer = request.IsSelfTransfer,
-                            Frequency = request.Frequency,
-                            Note = request.Note,
-                            StartDate = request.StartDate,
-                            EndDate = request.EndDate
-                        });
-
-                        return Ok(new
-                        {
-                            Status = Constants.SUCCESS_STATUS,
-                            Data = result
-                        });
-                    }
-                    else
-                    {
-                        return StatusCode(200, new
-                        {
-                            Status = Constants.FAILED_STATUS,
-                            Message = "Transfer failed. No rows affected."
-                        });
-                    }
+                    string transactionId = AuthHelper.GenerateTransactionNumber("TRF");
+                        
+                var result = await db.QuerySingleAsync<dynamic>(_masterList.TransferbyAccount, new
+                {
+                    AccountNumberFrom = request.AccountNumberFrom,
+                    AccountNumberTo = request.AccountNumberTo,
+                    Amount = request.Amount,
+                    Currency = request.Currency,
+                    IsSelfTransfer = request.IsSelfTransfer,
+                    Frequency = request.Frequency,
+                    Note = request.Note,
+                    StartDate = request.StartDate,
+                    EndDate = request.EndDate,
+                    TransactionNumber = transactionId
+                });
+                        
+                return Ok(new
+                {
+                    Status = Constants.SUCCESS_STATUS,
+                    Data = result
+                });
                 }
                 else {
                     return StatusCode(200, new
@@ -373,6 +352,7 @@ namespace AcceInfoAPI.Controllers
                 {
                     foreach (var bal in request.ToAccountNumbers)
                     {
+                        string transactionId = AuthHelper.GenerateTransactionNumber("PMT");
                         var rowsAffected = await db.ExecuteAsync(_masterList.PayBill, new
                         {
                             AccountNumberFrom = request.AccountNumberFrom,
@@ -382,8 +362,10 @@ namespace AcceInfoAPI.Controllers
                             Frequency = bal.Frequency,
                             Note = bal.Memo,
                             StartDate = bal.StartDate,
-                            EndDate = bal.EndDate
+                            EndDate = bal.EndDate,
+                            TransationNumber = transactionId
                         });
+                        bal.TransactionNumber = transactionId;
                     }
                 }
                 else

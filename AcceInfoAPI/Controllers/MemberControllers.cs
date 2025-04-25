@@ -212,6 +212,7 @@ namespace AcceInfoAPI.Controllers
                     PayeeNumber = (string)x.PayeeNumber,
                     PayeeType = (string)x.PayeeType,
                     PayeeId = (string)x.PayeeId,
+                    PayeeTypeName = (string)x.PayeeTypeName
                 });
                 if (PayeeListQueryList != null && PayeeListQueryList.Count() > 0)
                 {
