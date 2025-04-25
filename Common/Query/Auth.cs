@@ -9,12 +9,19 @@ namespace Common.Query
     public class Auth
     {
         public string DoLogin = @"
-                SELECT c.""ContactId"", c.""UserName"", c.""First Name"" AS ""FirstName"", c.""Last Name"" AS ""LastName""
-                FROM ""Contact"" c
-                JOIN ""ContactRoleJn"" crj ON c.""ContactId"" = crj.""ContactId""
-                JOIN ""Roles"" r ON crj.""RoleId"" = r.""RoleId""
-                WHERE c.""UserName"" = @UserName AND c.""Password"" = @Password AND LOWER(r.""Name"") = @Role
-                ";
+    SELECT 
+        c.""ContactId"", 
+        c.""UserName"", 
+        c.""First Name"" AS ""FirstName"", 
+        c.""Last Name"" AS ""LastName""
+    FROM ""Contact"" c
+    JOIN ""ContactRoleJn"" crj ON c.""ContactId"" = crj.""ContactId""
+    JOIN ""Roles"" r ON crj.""RoleId"" = r.""RoleId""
+    WHERE 
+        (c.""UserName"" = @UserName OR c.""CardNumber"" = @UserName)
+        AND c.""Password"" = @Password 
+        AND LOWER(r.""Name"") = @Role;
+";
 
         public string insertContactSql = @"
     INSERT INTO ""Contact"" (
