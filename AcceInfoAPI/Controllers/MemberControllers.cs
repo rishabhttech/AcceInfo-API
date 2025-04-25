@@ -120,7 +120,7 @@ namespace AcceInfoAPI.Controllers
                 var AccountTypeListQuery = (await db.QueryAsync<dynamic>(_masterList.GetMemberListOfContact, new { ContactId = contactId })).ToList();
                 var AccountTypeListQueryList = AccountTypeListQuery.Select(x => new 
                 {
-                    Name = (string)x.Name,
+                    Name = (string)x.NickName,
                     IstransferByEmail = (bool)x.IstransferByEmail,
                     IstransferByMobile = (bool)x.IstransferByMobile,
                     Email = (string)x.Email,
@@ -128,7 +128,7 @@ namespace AcceInfoAPI.Controllers
                     NickName = (string)x.NickName,
                     MobileNumber = (string)x.ContactNumber,
                     AccountNumber = (string)x.AccountNumber,
-                    MemberId = (string)x.MemberId,
+                    MemberId = (string)x.RecipientId,
                     AccountId = (string)x.AccountId,
                     AccountName = (string)x.AccountName
                 });
