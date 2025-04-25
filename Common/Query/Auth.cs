@@ -204,16 +204,20 @@ SELECT
     r.""NickName"",
     r.""PrefLanguage"",
     r.""CreatedOn"",
+    c.""ContactId"" AS ""MemberContactId"",
     a.""AccountId"",
     a.""AccountNumber"",
-    a.""Balance""
+    a.""Balance"",
+    a.""Name""
 FROM public.""ContactRoleJn"" crj
 JOIN public.""Recipient"" r ON r.""RecipientId"" = crj.""MemberId""
-JOIN public.""CustomerAccountJn"" caj ON caj.""Customer"" = r.""Contact""
+JOIN public.""Contact"" c ON c.""Email"" = r.""Email""
+JOIN public.""CustomerAccountJn"" caj ON caj.""Customer"" = c.""ContactId""
 JOIN public.""Account"" a ON a.""AccountId"" = caj.""Account""
 JOIN public.""AccountCategory"" ac ON ac.""AccountCategoryId"" = a.""AccountCategory""
 WHERE crj.""ContactId"" = @ContactId
-  AND crj.""MemberId"" IS NOT NULL;
+  AND crj.""MemberId"" IS NOT NULL
+  AND ac.""Name"" = 'Spending (Chequing)';
 ";
 
 
