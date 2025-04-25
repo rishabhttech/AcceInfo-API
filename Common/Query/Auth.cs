@@ -115,8 +115,7 @@ WHERE c.""ContactId"" = @CustomerId";
     JOIN ""AccountCategory"" ac ON a.""AccountCategory"" = ac.""AccountCategoryId""
     WHERE a.""AccountId"" = @AccountId;
 ";
-
-        public string GetTransactionHistoryByAccountId = @"
+        public string GetTransactionHistoryByAccountIdWithDate = @"
     SELECT 
         t.""TransactionId"",
         t.""TransactionFrom"",
@@ -127,7 +126,25 @@ WHERE c.""ContactId"" = @CustomerId";
         t.""TransactionType"",
         t.""IsSelfTransfer""
     FROM ""Transactions"" t
+    WHERE t.""TransactionFrom"" = @AccountId
+      AND t.""CreatedOn"" BETWEEN @StartDate AND @EndDate
     ORDER BY t.""CreatedOn"" DESC;
+";
+
+        public string GetLast20TransactionHistoryByAccountId = @"
+    SELECT 
+        t.""TransactionId"",
+        t.""TransactionFrom"",
+        t.""TransactionTo"",
+        t.""CreatedOn"",
+        t.""Amount"",
+        t.""Note"",
+        t.""TransactionType"",
+        t.""IsSelfTransfer""
+    FROM ""Transactions"" t
+    WHERE t.""TransactionFrom"" = @AccountId
+    ORDER BY t.""CreatedOn"" DESC
+    LIMIT 20;
 ";
 
         public string checkAccountSql = @"

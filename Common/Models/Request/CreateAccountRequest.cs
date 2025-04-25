@@ -19,8 +19,4 @@ namespace Common.Models.Request
         [Range(0.01, double.MaxValue, ErrorMessage = Constants.ACCOUNT_VALID_AMOUNT_ERROR)]
         public decimal Amount { get; set; }
     }
-    public class TransactionHistoryRequest
-    {
-        public string AccountId { get; set; }
-    }
 }
