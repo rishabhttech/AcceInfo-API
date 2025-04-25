@@ -164,14 +164,17 @@ WHERE c.""ContactId"" = @CustomerId";
         public string GetMemberQuery= @"SELECT * FROM public.""ContactRoleJn"" WHERE ""MemberId"" IS NOT NULL AND ""ContactId"" = @ContactId";
 
         public string GetPayeeCategoriesQuery = @"SELECT * FROM public.""PayeeType"" ORDER BY ""Name"" ASC;";
-        public string GetPayeeByContact = @"SELECT  ""PayeeId"",
-    ""Payee Name"" AS ""PayeeName"",
-    ""Payee Number"" AS ""PayeeNumber"",
-    ""PayeeType"",
-    ""PayeeId""
-    ""ContactId""
-FROM public.""Payee""
-WHERE ""ContactId"" = @ContactId;";
+        public string GetPayeeByContact = @"
+SELECT  
+    p.""PayeeId"",
+    p.""Payee Name"" AS ""PayeeName"",
+    p.""Payee Number"" AS ""PayeeNumber"",
+    pt.""Name"" AS ""PayeeTypeName"",
+    p.""ContactId""
+FROM public.""Payee"" p
+JOIN public.""PayeeType"" pt ON pt.""PayeeTypeId"" = p.""PayeeType""
+WHERE p.""ContactId"" = @ContactId;
+";
 
         public string GetMemberListOfContact = @"
 SELECT 
@@ -205,53 +208,45 @@ WHERE crj.""ContactId"" = @ContactId
 
         public string TransferbyAccount = @"
 BEGIN;
- 
-     INSERT INTO ""Transactions"" (
-         ""TransactionFrom"",
-         ""TransactionTo"",
-         ""Amount"",
-         ""Currency"",
-         ""IsSelfTransfer"",
-         ""Frequency"",
-         ""Note"",
-         ""StartDate"",
-        ""EndDate""
-     ) 
-     VALUES (
-         @AccountNumberFrom,
-         @AccountNumberTo,
-         @Amount,
+
+    INSERT INTO ""Transactions"" (
+        ""TransactionFrom"",
+        ""TransactionTo"",
+        ""Amount"",
+        ""Currency"",
+        ""IsSelfTransfer"",
+        ""Frequency"",
+        ""Note"",
+        ""StartDate"",
+        ""EndDate"",
+        ""TransactionNumber""
+    ) 
+    VALUES (
+        @AccountNumberFrom,
+        @AccountNumberTo,
+        @Amount,
         @Currency,
         @IsSelfTransfer,
         @Frequency,
-         @Note,
-         @StartDate,
-        @EndDate
-     )
-     RETURNING 
-     ""TransactionId"", 
-     ""CreatedOn"", 
-     @AccountNumberFrom AS ""AccountNumberFrom"", 
-     @AccountNumberTo AS ""AccountNumberTo"", 
-     @Amount AS ""Amount"", 
-     @Currency AS ""Currency"",
-     @IsSelfTransfer AS ""IsSelfTransfer"",
-     @Frequency AS ""Frequency"",
-     @Note AS ""Note"",
-     @StartDate AS ""StartDate"",
-     @EndDate AS ""EndDate""
-    ;
- 
+        @Note,
+        @StartDate,
+        @EndDate,
+        @TransactionNumber
+        
+    )
+    RETURNING 
+        ""TransactionId"", 
+        ""CreatedOn"",
+        ""TransactionNumber"";
 
-     UPDATE ""Account""
-     SET ""Balance"" = ""Balance"" - @Amount
-     WHERE ""AccountId"" = @AccountNumberFrom;
- 
-     UPDATE ""Account""
-     SET ""Balance"" = ""Balance"" + @Amount
-     WHERE ""AccountId"" = @AccountNumberTo;
- 
- 
+    UPDATE ""Account""
+    SET ""Balance"" = ""Balance"" - @Amount
+    WHERE ""AccountId"" = @AccountNumberFrom;
+
+    UPDATE ""Account""
+    SET ""Balance"" = ""Balance"" + @Amount
+    WHERE ""AccountId"" = @AccountNumberTo;
+
 COMMIT;
 ";
 
@@ -266,7 +261,8 @@ BEGIN;
          ""Frequency"",
          ""Note"",
          ""StartDate"",
-        ""EndDate""
+        ""EndDate"",
+        ""TransactionNumber""
      ) 
      VALUES (
          @AccountNumberFrom,
@@ -276,7 +272,8 @@ BEGIN;
         @Frequency,
          @Note,
          @StartDate,
-        @EndDate
+        @EndDate,
+        @TransationNumber
      )
      RETURNING 
      ""TransactionId"", 

@@ -2,6 +2,7 @@
 using Common.Models.Response;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -13,6 +14,8 @@ namespace Common.Helper
         private static Dictionary<string, string> _refreshTokenStore = new Dictionary<string, string>();
         private readonly IConfiguration _configuration;
         private readonly LoginResponse _responseModel;
+        private static readonly Random _random = new Random();
+        private const string _chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         public AuthHelper(IConfiguration configuration)
         {
             _configuration = configuration;
@@ -81,6 +84,13 @@ namespace Common.Helper
         {
             var random = new Random();
             return random.Next(1000000, 9999999).ToString() + random.Next(1000000, 9999999).ToString("D6").Substring(0, 6);
+        }
+
+        public static string GenerateTransactionNumber(string type)
+        {
+            var date = DateTime.UtcNow.ToString("yyyyMMdd");
+            var unique = Guid.NewGuid().ToString("N").Substring(0, 6).ToUpper();
+            return $"TRX-{type}-{date}-{unique}";
         }
     }
 }
