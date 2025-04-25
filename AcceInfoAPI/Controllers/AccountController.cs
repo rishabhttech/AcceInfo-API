@@ -172,7 +172,7 @@ namespace AcceInfoAPI.Controllers
                     statusCode = System.Net.HttpStatusCode.BadRequest,
                     Message = Constants.LOGIN_FAILED
                 });
-            }
+            }   
 
         }
 
@@ -193,19 +193,31 @@ namespace AcceInfoAPI.Controllers
 
                 var db = new DBConnectionHelper(_configuration, _configuration[Constants.DB_CONNECTIONSTRING]);
 
-                var transactions = (await db.QueryAsync<dynamic>(_masterList.GetTransactionHistoryByAccountId, new
-                {
-                    AccountId = request.AccountId
-                })).ToList();
+                string query;
+                object parameters;
 
-                //if (transactions == null || transactions.Count == 0)
-                //{
-                //    return Ok(new
-                //    {
-                //        Status = Constants.SUCCESS_STATUS,
-                //        Data = new List<TransactionHistoryResponse>() // Make sure it's still wrapped in "Data"
-                //    });
-                //}
+                if (request.StartDate.HasValue && request.EndDate.HasValue)
+                {
+                    // If both StartDate and EndDate provided
+                    query = _masterList.GetTransactionHistoryByAccountIdWithDate;
+                    parameters = new
+                    {
+                        AccountId = request.AccountId,
+                        StartDate = request.StartDate.Value,
+                        EndDate = request.EndDate.Value
+                    };
+                }
+                else
+                {
+                    // If no StartDate or EndDate provided
+                    query = _masterList.GetLast20TransactionHistoryByAccountId;
+                    parameters = new
+                    {
+                        AccountId = request.AccountId
+                    };
+                }
+
+                var transactions = (await db.QueryAsync<dynamic>(query, parameters)).ToList();
 
                 var result = transactions.Select(t => new TransactionHistoryResponse
                 {
@@ -217,11 +229,12 @@ namespace AcceInfoAPI.Controllers
                     Note = (string)t.Note,
                     TransactionType = (string)t.TransactionType,
                     IsSelfTransfer = (bool)t.IsSelfTransfer
-                }).ToList(); 
+                }).ToList();
+
                 return Ok(new
                 {
                     Status = Constants.SUCCESS_STATUS,
-                    Data = result // Standardized with Transfer API
+                    Data = result
                 });
             }
             catch (Exception ex)
@@ -234,7 +247,6 @@ namespace AcceInfoAPI.Controllers
                 });
             }
         }
-
         [Authorize]
         [HttpPost("transfer-money")]
         public async Task<IActionResult> GetTransferMoney([FromBody] TransferRequest request)
