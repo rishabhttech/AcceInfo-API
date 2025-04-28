@@ -119,24 +119,40 @@ WHERE c.""ContactId"" = @CustomerId";
 SELECT 
     t.""TransactionId"",
     t.""TransactionFrom"",
+    t.""TransactionTo"",
     af.""AccountNumber"" AS ""TransactionFromAccountNumber"",
     cf.""First Name"" || ' ' || cf.""Last Name"" AS ""TransactionFromCustomerName"",
     acf.""Name"" AS ""TransactionFromAccountCategoryName"",
     
-    t.""TransactionTo"",
-    at.""AccountNumber"" AS ""TransactionToAccountNumber"",
-    ct.""First Name"" || ' ' || ct.""Last Name"" AS ""TransactionToCustomerName"",
-    act.""Name"" AS ""TransactionToAccountCategoryName"",
+    CASE 
+        WHEN t.""TransactionType"" = 'Bill Transfer' THEN pt.""Payee Name""
+        ELSE at.""AccountNumber""
+    END AS ""TransactionToAccountNumber"",
+    
+    CASE 
+        WHEN t.""TransactionType"" = 'Bill Transfer' THEN pt.""Payee Name""
+        ELSE ct.""First Name"" || ' ' || ct.""Last Name""
+    END AS ""TransactionToCustomerName"",
+    
+    CASE 
+        WHEN t.""TransactionType"" = 'Bill Transfer' THEN ptt.""Name""
+        ELSE act.""Name""
+    END AS ""TransactionToAccountCategoryName"",
+    
+    pt.""Payee Name"" AS ""PayeeName"",
+    ptt.""Name"" AS ""PayeeTypeName"",
+    pt.""Payee Number"" AS ""PayeeNumber"",
     
     t.""CreatedOn"",
     t.""Amount"",
     t.""Note"",
     t.""TransactionType"",
     t.""IsSelfTransfer"",
-    t.""TransactionType"",
     t.""TransactionNumber""
+
 FROM 
     ""Transactions"" t
+
 LEFT JOIN ""Account"" af ON t.""TransactionFrom"" = af.""AccountId""
 LEFT JOIN ""CustomerAccountJn"" caf ON af.""AccountId"" = caf.""Account""
 LEFT JOIN ""Contact"" cf ON caf.""Customer"" = cf.""ContactId""
@@ -147,10 +163,16 @@ LEFT JOIN ""CustomerAccountJn"" cat ON at.""AccountId"" = cat.""Account""
 LEFT JOIN ""Contact"" ct ON cat.""Customer"" = ct.""ContactId""
 LEFT JOIN ""AccountCategory"" act ON at.""AccountCategory"" = act.""AccountCategoryId""
 
-    WHERE t.""TransactionFrom"" = @AccountId OR t.""TransactionTo"" = @AccountId
-    AND t.""CreatedOn"" BETWEEN @FromDate AND @Todate
+LEFT JOIN ""Payee"" pt ON t.""TransactionTo"" = pt.""PayeeId""
+LEFT JOIN ""PayeeType"" ptt ON pt.""PayeeType"" = ptt.""PayeeTypeId""
+
+WHERE 
+    t.""TransactionFrom"" = @AccountId
+    OR t.""TransactionTo"" = @AccountId AND t.""CreatedOn"" BETWEEN @FromDate AND @Todate
+
 ORDER BY 
     t.""CreatedOn"" DESC
+
 LIMIT 20;
 ";
 
@@ -158,14 +180,29 @@ LIMIT 20;
 SELECT 
     t.""TransactionId"",
     t.""TransactionFrom"",
+    t.""TransactionTo"",
     af.""AccountNumber"" AS ""TransactionFromAccountNumber"",
     cf.""First Name"" || ' ' || cf.""Last Name"" AS ""TransactionFromCustomerName"",
     acf.""Name"" AS ""TransactionFromAccountCategoryName"",
     
-    t.""TransactionTo"",
-    at.""AccountNumber"" AS ""TransactionToAccountNumber"",
-    ct.""First Name"" || ' ' || ct.""Last Name"" AS ""TransactionToCustomerName"",
-    act.""Name"" AS ""TransactionToAccountCategoryName"",
+    CASE 
+        WHEN t.""TransactionType"" = 'Bill Transfer' THEN pt.""Payee Name""
+        ELSE at.""AccountNumber""
+    END AS ""TransactionToAccountNumber"",
+    
+    CASE 
+        WHEN t.""TransactionType"" = 'Bill Transfer' THEN pt.""Payee Name""
+        ELSE ct.""First Name"" || ' ' || ct.""Last Name""
+    END AS ""TransactionToCustomerName"",
+    
+    CASE 
+        WHEN t.""TransactionType"" = 'Bill Transfer' THEN ptt.""Name""
+        ELSE act.""Name""
+    END AS ""TransactionToAccountCategoryName"",
+    
+    pt.""Payee Name"" AS ""PayeeName"",
+    ptt.""Name"" AS ""PayeeTypeName"",
+    pt.""Payee Number"" AS ""PayeeNumber"",
     
     t.""CreatedOn"",
     t.""Amount"",
@@ -176,6 +213,7 @@ SELECT
 
 FROM 
     ""Transactions"" t
+
 LEFT JOIN ""Account"" af ON t.""TransactionFrom"" = af.""AccountId""
 LEFT JOIN ""CustomerAccountJn"" caf ON af.""AccountId"" = caf.""Account""
 LEFT JOIN ""Contact"" cf ON caf.""Customer"" = cf.""ContactId""
@@ -186,9 +224,16 @@ LEFT JOIN ""CustomerAccountJn"" cat ON at.""AccountId"" = cat.""Account""
 LEFT JOIN ""Contact"" ct ON cat.""Customer"" = ct.""ContactId""
 LEFT JOIN ""AccountCategory"" act ON at.""AccountCategory"" = act.""AccountCategoryId""
 
-WHERE t.""TransactionFrom"" = @AccountId OR t.""TransactionTo"" = @AccountId
+LEFT JOIN ""Payee"" pt ON t.""TransactionTo"" = pt.""PayeeId""
+LEFT JOIN ""PayeeType"" ptt ON pt.""PayeeType"" = ptt.""PayeeTypeId""
+
+WHERE 
+    t.""TransactionFrom"" = @AccountId
+    OR t.""TransactionTo"" = @AccountId
+
 ORDER BY 
     t.""CreatedOn"" DESC
+
 LIMIT 20;
 ";
 
