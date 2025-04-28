@@ -48,7 +48,9 @@ namespace AcceInfoAPI.Controllers
                 if(!string.IsNullOrEmpty(loginRequest.RefreshToken))
                 {
                     var contactId = _httpContextAccessor.HttpContext?.User?.FindFirst("contactId")?.Value;
-                    var refreshtokenresponse = authHelper.RefreshJwtToken(contactId, loginRequest.RefreshToken, loginRequest.Username, _configuration["Jwt:Key"], _configuration["Jwt:Issuer"], _configuration["Jwt:Audience"]);
+                    var username = _httpContextAccessor.HttpContext?.User?.FindFirst("username")?.Value;
+                    var pass = _httpContextAccessor.HttpContext?.User?.FindFirst("pass")?.Value;
+                    var refreshtokenresponse = authHelper.RefreshJwtToken(contactId, loginRequest.RefreshToken, username, _configuration["Jwt:Key"], _configuration["Jwt:Issuer"], _configuration["Jwt:Audience"], pass);
 
                     return Ok(new Common.Models.Response.LoginResponse
                     {
@@ -72,7 +74,7 @@ namespace AcceInfoAPI.Controllers
 
                 if (employee != null)
                 {
-                    var tokenresponse = authHelper.GenerateJwtToken(employee.UserName, employee.ContactId, _configuration["Jwt:Key"], _configuration["Jwt:Issuer"], _configuration["Jwt:Audience"]);
+                    var tokenresponse = authHelper.GenerateJwtToken(employee.UserName, employee.ContactId, _configuration["Jwt:Key"], _configuration["Jwt:Issuer"], _configuration["Jwt:Audience"], loginRequest.Password);
 
                     return Ok(new Common.Models.Response.LoginResponse
                     {
@@ -161,7 +163,7 @@ namespace AcceInfoAPI.Controllers
 
                 // Generate token using AuthHelper
                 AuthHelper authHelper = new AuthHelper(_configuration);
-                var tokenResponse = authHelper.GenerateJwtToken(employee.UserName, contactId, _configuration["Jwt:Key"], _configuration["Jwt:Issuer"], _configuration["Jwt:Audience"]);
+                var tokenResponse = authHelper.GenerateJwtToken(employee.UserName, contactId, _configuration["Jwt:Key"], _configuration["Jwt:Issuer"], _configuration["Jwt:Audience"], "");
 
                 return Ok(new Common.Models.Response.LoginResponse
                 {

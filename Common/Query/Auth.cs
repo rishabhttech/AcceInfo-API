@@ -116,35 +116,79 @@ WHERE c.""ContactId"" = @CustomerId";
     WHERE a.""AccountId"" = @AccountId;
 ";
         public string GetTransactionHistoryByAccountIdWithDate = @"
-    SELECT 
-        t.""TransactionId"",
-        t.""TransactionFrom"",
-        t.""TransactionTo"",
-        t.""CreatedOn"",
-        t.""Amount"",
-        t.""Note"",
-        t.""TransactionType"",
-        t.""IsSelfTransfer""
-    FROM ""Transactions"" t
-    WHERE t.""TransactionFrom"" = @AccountId
-      AND t.""CreatedOn"" BETWEEN @StartDate AND @EndDate
-    ORDER BY t.""CreatedOn"" DESC;
+SELECT 
+    t.""TransactionId"",
+    t.""TransactionFrom"",
+    af.""AccountNumber"" AS ""TransactionFromAccountNumber"",
+    cf.""First Name"" || ' ' || cf.""Last Name"" AS ""TransactionFromCustomerName"",
+    acf.""Name"" AS ""TransactionFromAccountCategoryName"",
+    
+    t.""TransactionTo"",
+    at.""AccountNumber"" AS ""TransactionToAccountNumber"",
+    ct.""First Name"" || ' ' || ct.""Last Name"" AS ""TransactionToCustomerName"",
+    act.""Name"" AS ""TransactionToAccountCategoryName"",
+    
+    t.""CreatedOn"",
+    t.""Amount"",
+    t.""Note"",
+    t.""TransactionType"",
+    t.""IsSelfTransfer""
+FROM 
+    ""Transactions"" t
+LEFT JOIN ""Account"" af ON t.""TransactionFrom"" = af.""AccountId""
+LEFT JOIN ""CustomerAccountJn"" caf ON af.""AccountId"" = caf.""Account""
+LEFT JOIN ""Contact"" cf ON caf.""Customer"" = cf.""ContactId""
+LEFT JOIN ""AccountCategory"" acf ON af.""AccountCategory"" = acf.""AccountCategoryId""
+
+LEFT JOIN ""Account"" at ON t.""TransactionTo"" = at.""AccountId""
+LEFT JOIN ""CustomerAccountJn"" cat ON at.""AccountId"" = cat.""Account""
+LEFT JOIN ""Contact"" ct ON cat.""Customer"" = ct.""ContactId""
+LEFT JOIN ""AccountCategory"" act ON at.""AccountCategory"" = act.""AccountCategoryId""
+
+WHERE 
+   (t.""TransactionFrom"" = @AccountId OR t.""TransactionTo"" = @AccountId)
+    AND t.""CreatedOn"" BETWEEN @FromDate AND @Todate
+ORDER BY 
+    t.""CreatedOn"" DESC
+LIMIT 20;
 ";
 
         public string GetLast20TransactionHistoryByAccountId = @"
-    SELECT 
-        t.""TransactionId"",
-        t.""TransactionFrom"",
-        t.""TransactionTo"",
-        t.""CreatedOn"",
-        t.""Amount"",
-        t.""Note"",
-        t.""TransactionType"",
-        t.""IsSelfTransfer""
-    FROM ""Transactions"" t
-    WHERE t.""TransactionFrom"" = @AccountId
-    ORDER BY t.""CreatedOn"" DESC
-    LIMIT 20;
+SELECT 
+    t.""TransactionId"",
+    t.""TransactionFrom"",
+    af.""AccountNumber"" AS ""TransactionFromAccountNumber"",
+    cf.""First Name"" || ' ' || cf.""Last Name"" AS ""TransactionFromCustomerName"",
+    acf.""Name"" AS ""TransactionFromAccountCategoryName"",
+    
+    t.""TransactionTo"",
+    at.""AccountNumber"" AS ""TransactionToAccountNumber"",
+    ct.""First Name"" || ' ' || ct.""Last Name"" AS ""TransactionToCustomerName"",
+    act.""Name"" AS ""TransactionToAccountCategoryName"",
+    
+    t.""CreatedOn"",
+    t.""Amount"",
+    t.""Note"",
+    t.""TransactionType"",
+    t.""IsSelfTransfer""
+FROM 
+    ""Transactions"" t
+LEFT JOIN ""Account"" af ON t.""TransactionFrom"" = af.""AccountId""
+LEFT JOIN ""CustomerAccountJn"" caf ON af.""AccountId"" = caf.""Account""
+LEFT JOIN ""Contact"" cf ON caf.""Customer"" = cf.""ContactId""
+LEFT JOIN ""AccountCategory"" acf ON af.""AccountCategory"" = acf.""AccountCategoryId""
+
+LEFT JOIN ""Account"" at ON t.""TransactionTo"" = at.""AccountId""
+LEFT JOIN ""CustomerAccountJn"" cat ON at.""AccountId"" = cat.""Account""
+LEFT JOIN ""Contact"" ct ON cat.""Customer"" = ct.""ContactId""
+LEFT JOIN ""AccountCategory"" act ON at.""AccountCategory"" = act.""AccountCategoryId""
+
+WHERE 
+    t.""TransactionFrom"" = @AccountId 
+    OR t.""TransactionTo"" = @AccountId
+ORDER BY 
+    t.""CreatedOn"" DESC
+LIMIT 20;
 ";
 
         public string checkAccountSql = @"
