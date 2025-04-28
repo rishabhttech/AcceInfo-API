@@ -21,7 +21,7 @@ namespace Common.Helper
             _configuration = configuration;
             _responseModel = new LoginResponse();
         }
-        public LoginResponse GenerateJwtToken(string username, string contactId, string JwtKey, string issuer, string audience)
+        public LoginResponse GenerateJwtToken(string username, string contactId, string JwtKey, string issuer, string audience,string password)
         {
             if (!string.IsNullOrEmpty(JwtKey) && !string.IsNullOrEmpty(username))
             {
@@ -33,6 +33,8 @@ namespace Common.Helper
                 {
                 new Claim(JwtRegisteredClaimNames.Sub, username),
                 new Claim("contactId", contactId),
+                new Claim("username", username),
+                new Claim("pass", password),
                 new Claim(ClaimTypes.Role, "User"),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 };
@@ -65,11 +67,11 @@ namespace Common.Helper
             }
             return _responseModel;
         }
-        public LoginResponse RefreshJwtToken(string contactId, string refreshToken, string username, string JwtKey, string issuer, string audience)
+        public LoginResponse RefreshJwtToken(string contactId, string refreshToken, string username, string JwtKey, string issuer, string audience, string password)
         {
             if (_refreshTokenStore.TryGetValue(username, out var storedRefreshToken) && storedRefreshToken == refreshToken)
             {
-                return GenerateJwtToken(username, contactId, JwtKey, issuer, audience); // generate new token
+                return GenerateJwtToken(username, contactId, JwtKey, issuer, audience, password); // generate new token
             }
 
             return new LoginResponse

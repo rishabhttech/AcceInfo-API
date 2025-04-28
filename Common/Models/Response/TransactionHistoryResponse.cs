@@ -26,6 +26,13 @@ namespace Common.Models.Response
         public string? Note { get; set; }
         public string? TransactionType { get; set; }
         public bool IsSelfTransfer { get; set; }
+        public string FromAccountNumber { get; set; }
+        public string ToAccountNumber { get; set; }
+        public string TransactionFromCustomerName { get; set; }
+        public string TransactionToCustomerName { get; set; }
+        public bool isCredit { get; set; }
+        public string FromAccountType { get; set; }
+        public string ToAccountType { get; set; }
     }
 
 

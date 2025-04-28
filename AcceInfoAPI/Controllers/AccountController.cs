@@ -203,8 +203,8 @@ namespace AcceInfoAPI.Controllers
                     parameters = new
                     {
                         AccountId = request.AccountId,
-                        StartDate = request.StartDate.Value,
-                        EndDate = request.EndDate.Value
+                        FromDate = request.StartDate.Value,
+                        ToDate = request.EndDate.Value
                     };
                 }
                 else
@@ -214,6 +214,7 @@ namespace AcceInfoAPI.Controllers
                     parameters = new
                     {
                         AccountId = request.AccountId
+
                     };
                 }
 
@@ -228,9 +229,25 @@ namespace AcceInfoAPI.Controllers
                     Amount = (int)t.Amount,
                     Note = (string)t.Note,
                     TransactionType = (string)t.TransactionType,
-                    IsSelfTransfer = (bool)t.IsSelfTransfer
+                    IsSelfTransfer = (bool)t.IsSelfTransfer,
+                    isCredit = t.TransactionFrom == request.AccountId ? false : true,
+                    FromAccountNumber = (string)t.TransactionFromAccountNumber,
+                    ToAccountNumber = (string)t.TransactionToAccountNumber,
+                    TransactionFromCustomerName = (string)t.TransactionFromCustomerName,
+                    TransactionToCustomerName = (string)t.TransactionToCustomerName,
+                    FromAccountType = (string)t.TransactionFromAccountCategoryName,
+                    ToAccountType = (string)t.TransactionToAccountCategoryName
                 }).ToList();
 
+
+                if(result ==  null || result.Count == 0)
+                {
+                    return Ok(new Common.Models.ResponseModel
+                    {
+                        Status = Constants.FAILED_STATUS,
+                        Message = Constants.DATA_NOT_FOUND
+                    });
+                }
                 return Ok(new
                 {
                     Status = Constants.SUCCESS_STATUS,
