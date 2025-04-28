@@ -222,28 +222,37 @@ namespace AcceInfoAPI.Controllers
 
                 var result = transactions.Select(t => {
                     bool isCredit = (string)t.TransactionTo == request.AccountId;
+
+
     
                     return new TransactionHistoryResponse
                     {
-                        TransactionId = (string)t.TransactionId,
-                        TransactionNumber = (string)t.TransactionNumber,
-                        TransactionFrom = (string)t.TransactionFrom,
-                        TransactionTo = (string)t.TransactionTo,
-                        CreatedOn = (DateTime)t.CreatedOn,
-                        Amount = (int)t.Amount,
-                        Note = (string)t.Note,
-                        TransactionType = (string)t.TransactionType,
-                        IsSelfTransfer = (bool)t.IsSelfTransfer,
-                        isCredit = isCredit,
+                        TransactionId = t.TransactionId ?? string.Empty,
+                        TransactionNumber = t.TransactionNumber ?? string.Empty,
+                        TransactionFrom = t.TransactionFrom ?? string.Empty,
+                        TransactionTo = t.TransactionTo ?? string.Empty,
+                        CreatedOn = t.CreatedOn,
+                        Amount = t.Amount,
+                        Note = t.Note ?? string.Empty,
+                        TransactionType = t.TransactionType ?? string.Empty,
+                        IsSelfTransfer = t.IsSelfTransfer,
+                        
 
-                        FromAccountNumber = (string)t.TransactionFromAccountNumber,
-                        ToAccountNumber = (string)t.TransactionToAccountNumber,
-        
-                        TransactionFromCustomerName = (string)t.TransactionFromCustomerName,
-                        TransactionToCustomerName = (string)t.TransactionToCustomerName,
-        
-                        FromAccountType = (string)t.TransactionFromAccountCategoryName,
-                        ToAccountType = (string)t.TransactionToAccountCategoryName,
+                        FromAccountNumber = t.TransactionFromAccountNumber ?? string.Empty,
+
+                        ToAccountNumber = t.TransactionType == "Bill Payment"
+        ? (t.PayeeNumber ?? string.Empty)
+        : (t.TransactionToAccountNumber ?? string.Empty),
+
+                        TransactionFromCustomerName = t.TransactionFromCustomerName ?? string.Empty,
+                        TransactionToCustomerName = t.TransactionType == "Bill Payment"
+        ? (t.PayeeName ?? string.Empty)
+        : (t.TransactionToCustomerName ?? string.Empty),
+
+                        FromAccountType = t.TransactionFromAccountCategoryName ?? string.Empty,
+                        ToAccountType = t.TransactionType == "Bill Payment"
+        ? (t.PayeeTypeName ?? string.Empty)
+        : (t.TransactionToAccountCategoryName ?? string.Empty)
                     };
                 }).ToList();
 
@@ -402,7 +411,7 @@ namespace AcceInfoAPI.Controllers
                             StartDate = bal.StartDate,
                             EndDate = bal.EndDate,
                             TransationNumber = transactionId,
-                            TransactionType = bal.TransactionType
+                            TransactionType = "Bill Payment"
                         });
                         bal.TransactionNumber = transactionId;
                     }
