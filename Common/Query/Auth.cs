@@ -132,7 +132,9 @@ SELECT
     t.""Amount"",
     t.""Note"",
     t.""TransactionType"",
-    t.""IsSelfTransfer""
+    t.""IsSelfTransfer"",
+    t.""TransactionType"",
+    t.""TransactionNumber""
 FROM 
     ""Transactions"" t
 LEFT JOIN ""Account"" af ON t.""TransactionFrom"" = af.""AccountId""
@@ -145,8 +147,7 @@ LEFT JOIN ""CustomerAccountJn"" cat ON at.""AccountId"" = cat.""Account""
 LEFT JOIN ""Contact"" ct ON cat.""Customer"" = ct.""ContactId""
 LEFT JOIN ""AccountCategory"" act ON at.""AccountCategory"" = act.""AccountCategoryId""
 
-WHERE 
-   (t.""TransactionFrom"" = @AccountId OR t.""TransactionTo"" = @AccountId)
+    WHERE t.""TransactionFrom"" = @AccountId OR t.""TransactionTo"" = @AccountId
     AND t.""CreatedOn"" BETWEEN @FromDate AND @Todate
 ORDER BY 
     t.""CreatedOn"" DESC
@@ -170,7 +171,9 @@ SELECT
     t.""Amount"",
     t.""Note"",
     t.""TransactionType"",
-    t.""IsSelfTransfer""
+    t.""IsSelfTransfer"",
+    t.""TransactionNumber""
+
 FROM 
     ""Transactions"" t
 LEFT JOIN ""Account"" af ON t.""TransactionFrom"" = af.""AccountId""
@@ -183,9 +186,7 @@ LEFT JOIN ""CustomerAccountJn"" cat ON at.""AccountId"" = cat.""Account""
 LEFT JOIN ""Contact"" ct ON cat.""Customer"" = ct.""ContactId""
 LEFT JOIN ""AccountCategory"" act ON at.""AccountCategory"" = act.""AccountCategoryId""
 
-WHERE 
-    t.""TransactionFrom"" = @AccountId 
-    OR t.""TransactionTo"" = @AccountId
+WHERE t.""TransactionFrom"" = @AccountId OR t.""TransactionTo"" = @AccountId
 ORDER BY 
     t.""CreatedOn"" DESC
 LIMIT 20;
@@ -284,7 +285,8 @@ BEGIN;
         ""Note"",
         ""StartDate"",
         ""EndDate"",
-        ""TransactionNumber""
+        ""TransactionNumber"",
+        ""TransactionType""
     ) 
     VALUES (
         @AccountNumberFrom,
@@ -296,13 +298,25 @@ BEGIN;
         @Note,
         @StartDate,
         @EndDate,
-        @TransactionNumber
+        @TransactionNumber,
+        @TransactionType
         
     )
     RETURNING 
         ""TransactionId"", 
         ""CreatedOn"",
-        ""TransactionNumber"";
+        ""TransactionNumber""
+        ""TransactionFrom"",
+        ""TransactionTo"",
+        ""Amount"",
+        ""Currency"",
+        ""IsSelfTransfer"",
+        ""Frequency"",
+        ""Note"",
+        ""StartDate"",
+        ""EndDate"",
+        ""TransactionNumber"",
+        ""TransactionType"";
 
     UPDATE ""Account""
     SET ""Balance"" = ""Balance"" - @Amount
@@ -318,48 +332,51 @@ COMMIT;
         public string PayBill = @"
 BEGIN;
  
-     INSERT INTO ""Transactions"" (
-         ""TransactionFrom"",
-         ""TransactionTo"",
-         ""Amount"",
-         ""Currency"",
-         ""Frequency"",
-         ""Note"",
-         ""StartDate"",
-        ""EndDate"",
-        ""TransactionNumber""
-     ) 
-     VALUES (
-         @AccountNumberFrom,
-         @AccountNumberTo,
-         @Amount,
-        @Currency,
-        @Frequency,
-         @Note,
-         @StartDate,
-        @EndDate,
-        @TransationNumber
-     )
-     RETURNING 
-     ""TransactionId"", 
-     ""CreatedOn"", 
-     @AccountNumberFrom AS ""AccountNumberFrom"", 
-     @AccountNumberTo AS ""AccountNumberTo"", 
-     @Amount AS ""Amount"", 
-     @Currency AS ""Currency"",
-     @Frequency AS ""Frequency"",
-     @Note AS ""Note"",
-     @StartDate AS ""StartDate"",
-     @EndDate AS ""EndDate""
-    ;
+INSERT INTO ""Transactions"" (
+    ""TransactionFrom"",
+    ""TransactionTo"",
+    ""Amount"",
+    ""Currency"",
+    ""Frequency"",
+    ""Note"",
+    ""StartDate"",
+    ""EndDate"",
+    ""TransactionNumber"",
+    ""TransactionType""
+) 
+VALUES (
+    @AccountNumberFrom,
+    @AccountNumberTo,
+    @Amount,
+    @Currency,
+    @Frequency,
+    @Note,
+    @StartDate,
+    @EndDate,
+    @TransationNumber, 
+    @TransactionType
+)
+RETURNING 
+    ""TransactionId"", 
+    ""CreatedOn"",
+    ""TransactionFrom"",
+    ""TransactionTo"",
+    ""Amount"",
+    ""Currency"",
+    ""Frequency"",
+    ""Note"",
+    ""StartDate"",
+    ""EndDate"",
+    ""TransactionNumber"",
+    ""TransactionType"";
  
-
-     UPDATE ""Account""
-     SET ""Balance"" = ""Balance"" - @Amount
-     WHERE ""AccountId"" = @AccountNumberFrom;
+UPDATE ""Account""
+SET ""Balance"" = ""Balance"" - @Amount
+WHERE ""AccountId"" = @AccountNumberFrom;
  
 COMMIT;
 ";
+
 
         public string CheckIfMemberExistbyEmail = @"SELECT ""ContactId"" FROM public.""Contact"" WHERE ""Email"" = @Email";
         public string insertRecipientSql = @"

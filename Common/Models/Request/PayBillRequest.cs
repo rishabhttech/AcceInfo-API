@@ -13,6 +13,7 @@ namespace Common.Models.Request
         public string AccountNumberFrom { get; set; }
 
         public List<FromParty> ToAccountNumbers { get; set; }
+        //public string TransactionType { get; set; }
 
     }
     public class FromParty
@@ -29,13 +30,16 @@ namespace Common.Models.Request
         [Required(ErrorMessage = Constants.ACCOUNT_AccountName_REQUIRED)]
         public string Frequency { get; set; }
 
+
         [Required(ErrorMessage = Constants.ACCOUNT_AccountName_REQUIRED)]
         public DateTime StartDate { get; set; }
 
         [Required(ErrorMessage = Constants.ACCOUNT_AccountName_REQUIRED)]
         public DateTime EndDate { get; set; }
         public string Memo { get; set; }
-        public string TransactionNumber { get; set; }
+        public string TransactionNumber { get; set; }  
+        public string TransactionType { get; set; }
+
 
     }
 }

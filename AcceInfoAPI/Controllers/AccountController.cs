@@ -220,23 +220,31 @@ namespace AcceInfoAPI.Controllers
 
                 var transactions = (await db.QueryAsync<dynamic>(query, parameters)).ToList();
 
-                var result = transactions.Select(t => new TransactionHistoryResponse
-                {
-                    TransactionId = (string)t.TransactionId,
-                    TransactionFrom = (string)t.TransactionFrom,
-                    TransactionTo = (string)t.TransactionTo,
-                    CreatedOn = (DateTime)t.CreatedOn,
-                    Amount = (int)t.Amount,
-                    Note = (string)t.Note,
-                    TransactionType = (string)t.TransactionType,
-                    IsSelfTransfer = (bool)t.IsSelfTransfer,
-                    isCredit = t.TransactionFrom == request.AccountId ? false : true,
-                    FromAccountNumber = (string)t.TransactionFromAccountNumber,
-                    ToAccountNumber = (string)t.TransactionToAccountNumber,
-                    TransactionFromCustomerName = (string)t.TransactionFromCustomerName,
-                    TransactionToCustomerName = (string)t.TransactionToCustomerName,
-                    FromAccountType = (string)t.TransactionFromAccountCategoryName,
-                    ToAccountType = (string)t.TransactionToAccountCategoryName
+                var result = transactions.Select(t => {
+                    bool isCredit = (string)t.TransactionTo == request.AccountId;
+    
+                    return new TransactionHistoryResponse
+                    {
+                        TransactionId = (string)t.TransactionId,
+                        TransactionNumber = (string)t.TransactionNumber,
+                        TransactionFrom = (string)t.TransactionFrom,
+                        TransactionTo = (string)t.TransactionTo,
+                        CreatedOn = (DateTime)t.CreatedOn,
+                        Amount = (int)t.Amount,
+                        Note = (string)t.Note,
+                        TransactionType = (string)t.TransactionType,
+                        IsSelfTransfer = (bool)t.IsSelfTransfer,
+                        isCredit = isCredit,
+
+                        FromAccountNumber = (string)t.TransactionFromAccountNumber,
+                        ToAccountNumber = (string)t.TransactionToAccountNumber,
+        
+                        TransactionFromCustomerName = (string)t.TransactionFromCustomerName,
+                        TransactionToCustomerName = (string)t.TransactionToCustomerName,
+        
+                        FromAccountType = (string)t.TransactionFromAccountCategoryName,
+                        ToAccountType = (string)t.TransactionToAccountCategoryName,
+                    };
                 }).ToList();
 
 
@@ -325,7 +333,8 @@ namespace AcceInfoAPI.Controllers
                     Note = request.Note,
                     StartDate = request.StartDate,
                     EndDate = request.EndDate,
-                    TransactionNumber = transactionId
+                    TransactionNumber = transactionId,
+                    TransactionType = request.TransactionType
                 });
                         
                 return Ok(new
@@ -392,7 +401,8 @@ namespace AcceInfoAPI.Controllers
                             Note = bal.Memo,
                             StartDate = bal.StartDate,
                             EndDate = bal.EndDate,
-                            TransationNumber = transactionId
+                            TransationNumber = transactionId,
+                            TransactionType = bal.TransactionType
                         });
                         bal.TransactionNumber = transactionId;
                     }
