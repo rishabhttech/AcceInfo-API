@@ -32,6 +32,7 @@ namespace Common.Models.Response
         public string TransactionToCustomerName { get; set; }
         public bool isCredit { get; set; }
         public string FromAccountType { get; set; }
+        public string TransactionNumber { get; set; }
         public string ToAccountType { get; set; }
     }
 

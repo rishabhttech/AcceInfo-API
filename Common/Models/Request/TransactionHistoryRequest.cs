@@ -10,7 +10,7 @@ namespace Common.Models.Request
     public class TransactionHistoryRequest
     {
         public string AccountId { get; set; }
-        public DateTime? StartDate { get; set; } // Important: make it nullable
-        public DateTime? EndDate { get; set; }    // Important: make it nullable
+        public DateTime? StartDate { get; set; } 
+        public DateTime? EndDate { get; set; }   
     }
 }
