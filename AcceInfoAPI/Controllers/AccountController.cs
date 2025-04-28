@@ -224,7 +224,7 @@ namespace AcceInfoAPI.Controllers
                     bool isCredit = (string)t.TransactionTo == request.AccountId;
 
 
-    
+
                     return new TransactionHistoryResponse
                     {
                         TransactionId = t.TransactionId ?? string.Empty,
@@ -236,7 +236,7 @@ namespace AcceInfoAPI.Controllers
                         Note = t.Note ?? string.Empty,
                         TransactionType = t.TransactionType ?? string.Empty,
                         IsSelfTransfer = t.IsSelfTransfer,
-                        
+                        isCredit = t.TransactionFrom == request.AccountId ? false : true,
 
                         FromAccountNumber = t.TransactionFromAccountNumber ?? string.Empty,
 
