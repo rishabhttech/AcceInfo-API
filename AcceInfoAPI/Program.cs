@@ -30,6 +30,7 @@ builder.Services.AddAuthentication("Bearer")
             )
         };
     });
+
 builder.Services.AddHttpContextAccessor();
 var app = builder.Build();
 app.UseAuthentication();
