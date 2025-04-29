@@ -94,5 +94,22 @@ namespace Common.Helper
             var unique = Guid.NewGuid().ToString("N").Substring(0, 6).ToUpper();
             return $"TRX-{type}-{date}-{unique}";
         }
+
+        public static string Generate16DigitCardNumber()
+        {
+            Random random = new Random();
+            string cardNumber = "";
+
+            // Generate the first digit carefully (not zero)
+            cardNumber += random.Next(4, 7); // Usually starts with 4 (Visa), 5 (MasterCard), 6 (Discover)
+
+            // Generate the remaining 15 digits
+            for (int i = 0; i < 15; i++)
+            {
+                cardNumber += random.Next(0, 10).ToString();
+            }
+
+            return cardNumber;
+        }
     }
 }

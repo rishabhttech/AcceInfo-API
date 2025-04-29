@@ -257,6 +257,19 @@ LIMIT 20;
     RETURNING ""ContactRoleJnId""
 ";
 
+        public string insertCustomerRoleJnSql = @"
+    INSERT INTO ""ContactRoleJn"" (
+        ""ContactId"",
+        ""RoleId""
+        
+    )
+    VALUES (
+        @ContactId,
+        @RoleId
+    )
+    RETURNING ""ContactRoleJnId""
+";
+
         public string insertCustomerAccountJnSql = @"
     INSERT INTO ""CustomerAccountJn"" (
         ""ContactId"",
@@ -462,5 +475,49 @@ COMMIT;
             @ContactId
         )
         RETURNING ""PayeeId"";";
+    }
+
+    public class Customer
+    {
+        public string insertCustomerQuery = @"
+        INSERT INTO public.""Contact"" (
+            ""First Name"",
+            ""Last Name"",
+            ""Password"",
+            ""UserName"",
+            ""Email"",
+            ""MobileNumber"",
+            ""CreatedBy"",
+            ""CardNumber""
+        )
+        VALUES (
+            @FirstName,
+            @LastName,
+            @Password,
+            @UserName,
+            @Email,
+            @MobileNumber,
+            @CreatedBy,
+            @CardNumber
+        )
+        RETURNING ""ContactId""
+;";
+
+        public string GetCustomer = @"
+        SELECT 
+            c.""ContactId"",
+            c.""First Name"" AS ""FirstName"",
+            c.""Last Name"" AS ""LastName"",
+            c.""UserName"",
+            c.""Email"",
+            c.""MobileNumber"",
+            c.""CardNumber""
+        FROM 
+            ""Contact"" c
+        INNER JOIN 
+            ""ContactRoleJn"" crj ON c.""ContactId"" = crj.""ContactId""
+        WHERE 
+            crj.""RoleId"" = @RoleId;
+    ";
     }
 }

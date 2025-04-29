@@ -20,7 +20,7 @@ namespace Common.Models
         public static readonly string DATA_NOT_FOUND = "Data not found";
 
         public static readonly string LOGIN_SUCCESSFULLY = "Login Successfull";
-        public static readonly string LOGIN_FAILED = "Login Failed";
+        public static readonly string LOGIN_FAILED = "Incorrect username or password. Please try again.";
         public const string LOGIN_TOKEN_USERNAME_EMPTY = "Username is missing.";
         public const string LOGIN_PASSWORD_MISSING = "Password is missing.";
         public const string LOGIN_TYPE_MISSING = "Password is missing.";
@@ -40,6 +40,7 @@ namespace Common.Models
         public const string ACCOUNT_Amount_REQUIRED = "Amount is required.";
         public const string ACCOUNT_VALID_AMOUNT_ERROR = "Amount must be greater than zero.";
         public const string ACCOUNT_NOT_FOUND = "Account not found.";
+        public const string ACCOUNT_CHEQUING_ID = "1c130c28-9074-4e4e-94ed-a8aa6019cb43";
         #endregion
 
         #region Member
@@ -62,6 +63,15 @@ namespace Common.Models
         public const string PAYEE_NAME_REQUIRE = "Payee Name is required.";
         public const string PAYEE_NUMBER_REQUIRE = "Payee Number is required.";
         public const string PAYEE_TYPE_REQUIRE = "Payee Type is required.";
+        public const string CUSTOMER_TYPE_ID = "31443fe6-1588-4b45-bc00-3717595a1cff";
+        public const string CUSTOMER_NOT_CREATED = "Customer not created.";
+        public const string First_NAME_REQUIRED = "First Name Required.";
+        public const string Last_NAME_REQUIRED = "Last Name Required.";
+        public const string PASSWORD_REQUIRED = "Password Required.";
+        public const string USERNAME_REQUIRED = "UserName Required.";
+
+
+
         #endregion
     }
 }

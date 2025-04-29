@@ -1,10 +1,13 @@
 ﻿using Common.Models;
+using Common.Models.Request;
+using Common.Models.Response;
 using Common.Query;
 using Dapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Security.Principal;
 using System.Xml.Linq;
 
 namespace AcceInfoAPI.Controllers
@@ -17,11 +20,13 @@ namespace AcceInfoAPI.Controllers
         private Common.Query.Auth _auth;
         private Common.Query.Account _masterList;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private Common.Query.Customer _customer;
 
         public MemberControllers(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _configuration = configuration;
             _auth = new Common.Query.Auth();
+            _customer = new Common.Query.Customer();
             _masterList = new Common.Query.Account();
             _httpContextAccessor = httpContextAccessor;
         }
@@ -236,7 +241,7 @@ namespace AcceInfoAPI.Controllers
                     });
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return Ok(
                     new Common.Models.ResponseModel
@@ -245,6 +250,146 @@ namespace AcceInfoAPI.Controllers
                         Status = Constants.FAILED_STATUS,
                         Message = Constants.ERROR_STATUS
                     });
+            }
+        }
+        [Authorize]
+        [HttpPost("AddCustomer")]
+        public async Task<IActionResult> AddCustomer([FromBody] CustomerRequestModel request)
+        {
+
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values
+                       .SelectMany(v => v.Errors)
+                       .Select(e => e.ErrorMessage)
+                       .ToList();
+                return BadRequest(new Common.Models.ResponseModel
+                {
+                    Status = Common.Models.Constants.ERROR_STATUS,
+                    Message = Common.Models.Constants.MISSING_FIELDS,
+                    statusCode = HttpStatusCode.BadRequest,
+                    ErrorMessages = errors
+                });
+            }
+
+            var db = new Common.Helper.DBConnectionHelper(_configuration, _configuration[Common.Models.Constants.DB_CONNECTIONSTRING]);
+            using var conn = await db.GetOpenConnectionAsync();
+            using var trx = conn.BeginTransaction();
+
+            try
+            {
+
+                var UserId = _httpContextAccessor.HttpContext?.User?.FindFirst("contactId")?.Value;
+                string CardNumber = Common.Helper.AuthHelper.Generate16DigitCardNumber();
+                var Customer = await conn.ExecuteScalarAsync<string>(_customer.insertCustomerQuery, new
+                {
+                    FirstName = request.FirstName,
+                    LastName = request.LastName,
+                    Password = request.Password,
+                    UserName = request.UserName,
+                    Email = request.Email,
+                    MobileNumber = request.MobileNumber,
+                    CreatedBy = UserId,
+                    CardNumber = CardNumber
+                }, trx);
+
+                var CustomerRoleJn = await conn.ExecuteScalarAsync<string>(_masterList.insertCustomerRoleJnSql, new
+                {
+                    ContactId = Customer,
+                    RoleId = Constants.CUSTOMER_TYPE_ID
+                }, trx);
+
+
+                // Generate account number and IDs
+                string accountNumber = Common.Helper.AuthHelper.Generate13DigitAccountNumber();
+                
+                // Insert account
+                var newAccountId = await conn.ExecuteScalarAsync<string>(_masterList.insertAccountSql, new
+                {
+                    AccountNumber = accountNumber,
+                    Balance = 50000.00,
+                    Status = true,
+                    AccountCategory = Constants.ACCOUNT_CHEQUING_ID,
+                    Name = request.FirstName + " Primary Account"
+                }, trx);
+
+                // Link customer to account
+                var contactAccountJoinId = await conn.ExecuteScalarAsync<string>(_masterList.insertCustomerAccountSql, new
+                {
+                    AccountId = newAccountId,
+                    CustomerId = Customer,
+                    Status = true
+                }, trx);
+
+                await trx.CommitAsync();
+
+                return Ok(new
+                {
+                    status = "success",
+                    message = "Customer and Account created successfully.",
+                    contactId = Customer,
+                    accountId = newAccountId
+                });
+            }
+            catch (Exception ex)
+            {
+                await trx.RollbackAsync();
+                return StatusCode(500, new
+                {
+                    status = Constants.ERROR_STATUS,
+                    message = Constants.CUSTOMER_NOT_CREATED,
+                    error = ex.Message
+                });
+            }
+        }
+
+        [Authorize]
+        [HttpGet("GetCustomer")]
+        public async Task<IActionResult> GetCustomerList()
+        {
+            try
+            {
+                var db = new Common.Helper.DBConnectionHelper(_configuration, _configuration[Common.Models.Constants.DB_CONNECTIONSTRING]);
+
+                var AccountTypeListQuery = (await db.QueryAsync<dynamic>(_customer.GetCustomer, new { RoleId = Constants.CUSTOMER_TYPE_ID }));
+
+                var AccountTypeListQueryList = AccountTypeListQuery.Select(x => new Common.Models.Response.ContactResponseModel
+                {
+                    FirstName = (string)x.FirstName,
+                    LastName = (string)x.LastName,
+                    MobileNumber = (string)x.MobileNumber,
+                    Email = (string)x.Email,
+                    UserName = (string)x.UserName,
+                    CardNumber = (string)x.CardNumber,
+                    ContactId = (string)x.ContactId
+
+                });
+
+                if (AccountTypeListQuery != null)
+                {
+                    return Ok(new
+                    {
+                        Status = Constants.SUCCESS_STATUS,
+                        Data = AccountTypeListQuery
+                    });
+                }
+                else
+                {
+                    return Ok(new
+                    {
+                        Status = Constants.FAILED_STATUS,
+                        Message = "Customer Not Found"
+                    });
+                }
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    status = Constants.ERROR_STATUS,
+                    message = Constants.DATA_NOT_FOUND,
+                    error = ex.Message
+                });
             }
         }
 

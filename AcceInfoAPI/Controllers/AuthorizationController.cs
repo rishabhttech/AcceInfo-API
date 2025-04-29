@@ -141,7 +141,7 @@ namespace AcceInfoAPI.Controllers
                     return BadRequest(new
                     {
                         Status = Constants.FAILED_STATUS,
-                        Message = "Missing contactId in token."
+                        Message = "Invalid OTP. Please enter the correct code."
                     });
                 }
 
