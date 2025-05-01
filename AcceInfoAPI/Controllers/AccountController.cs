@@ -203,8 +203,8 @@ namespace AcceInfoAPI.Controllers
                     parameters = new
                     {
                         AccountId = request.AccountId,
-                        FromDate = request.StartDate.Value,
-                        ToDate = request.EndDate.Value
+                        StartDate = request.StartDate.Value,
+                        EndDate = request.EndDate.Value
                     };
                 }
                 else

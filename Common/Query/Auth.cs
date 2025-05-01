@@ -167,8 +167,8 @@ LEFT JOIN ""Payee"" pt ON t.""TransactionTo"" = pt.""PayeeId""
 LEFT JOIN ""PayeeType"" ptt ON pt.""PayeeType"" = ptt.""PayeeTypeId""
 
 WHERE 
-    t.""TransactionFrom"" = @AccountId
-    OR t.""TransactionTo"" = @AccountId AND t.""CreatedOn"" BETWEEN @FromDate AND @Todate
+    (t.""TransactionFrom"" = @AccountId OR t.""TransactionTo"" = @AccountId)
+    AND t.""CreatedOn"" BETWEEN @StartDate AND @EndDate
 
 ORDER BY 
     t.""CreatedOn"" DESC

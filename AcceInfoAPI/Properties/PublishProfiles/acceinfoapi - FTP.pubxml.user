@@ -7,5 +7,83 @@ by editing this MSBuild file. In order to learn more about this please visit htt
   <PropertyGroup>
     <TimeStampOfAssociatedLegacyPublishXmlFile />
     <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAJBy7Xv1n8EKwxsRNtS5wqgAAAAACAAAAAAAQZgAAAAEAACAAAABjhqvdsY2V/tAXVuQ0/4M7dO+RAwY/RXiyBw9GNfPfHgAAAAAOgAAAAAIAACAAAAAskOaKOhdH5p9YPO3kJAfRDlzD8CtjycK/YzyHGM7YlYAAAAANDc/wozzOvNEseECJjjERpjnXzJvX7KUAXqkuvXXKFQJMHH9uJ4k4yfNhseEXpuzWGQqX5Oykn1a0C03YEpo1kOqxwNwNhljxjGnSkoGT5IrSSndKNZNnUWOgBb1aswsljZUauB8tTV+mYlVqvtb02G9Dg72/4JP05KAeEPtTPkAAAAAFJvqHHX2lxdwH57VdMWMNAuYfxXkGSJmofF5BYKiLxQ8iy5OYa9HSU74oD0RUEJL9XKwUfEx/qyNPPCLr9IWB</EncryptedPassword>
+    <_PublishTargetUrl>ftps://waws-prod-bn1-145.ftp.azurewebsites.windows.net/site/wwwroot</_PublishTargetUrl>
   </PropertyGroup>
+  <ItemGroup>
+    <File Include="AcceInfoAPI.deps.json">
+      <publishTime>04/29/2025 18:41:41</publishTime>
+    </File>
+    <File Include="AcceInfoAPI.dll">
+      <publishTime>04/29/2025 18:41:40</publishTime>
+    </File>
+    <File Include="AcceInfoAPI.exe">
+      <publishTime>04/29/2025 18:41:40</publishTime>
+    </File>
+    <File Include="AcceInfoAPI.pdb">
+      <publishTime>04/29/2025 18:41:40</publishTime>
+    </File>
+    <File Include="AcceInfoAPI.runtimeconfig.json">
+      <publishTime>04/28/2025 15:18:55</publishTime>
+    </File>
+    <File Include="AcceInfoAPI.staticwebassets.endpoints.json">
+      <publishTime>04/16/2025 10:18:38</publishTime>
+    </File>
+    <File Include="appsettings.Development.json">
+      <publishTime>04/15/2025 12:29:50</publishTime>
+    </File>
+    <File Include="appsettings.json">
+      <publishTime>04/15/2025 13:41:24</publishTime>
+    </File>
+    <File Include="Common.dll">
+      <publishTime>04/29/2025 18:41:39</publishTime>
+    </File>
+    <File Include="Common.pdb">
+      <publishTime>04/29/2025 18:41:39</publishTime>
+    </File>
+    <File Include="Dapper.dll">
+      <publishTime>02/06/2025 17:46:30</publishTime>
+    </File>
+    <File Include="Microsoft.AspNetCore.Authentication.JwtBearer.dll">
+      <publishTime>03/14/2025 22:39:10</publishTime>
+    </File>
+    <File Include="Microsoft.AspNetCore.OpenApi.dll">
+      <publishTime>01/18/2025 01:49:10</publishTime>
+    </File>
+    <File Include="Microsoft.Extensions.Configuration.Abstractions.dll">
+      <publishTime>03/14/2025 03:36:02</publishTime>
+    </File>
+    <File Include="Microsoft.Extensions.Primitives.dll">
+      <publishTime>03/14/2025 03:35:52</publishTime>
+    </File>
+    <File Include="Microsoft.IdentityModel.Abstractions.dll">
+      <publishTime>04/08/2025 08:07:04</publishTime>
+    </File>
+    <File Include="Microsoft.IdentityModel.JsonWebTokens.dll">
+      <publishTime>04/08/2025 08:06:54</publishTime>
+    </File>
+    <File Include="Microsoft.IdentityModel.Logging.dll">
+      <publishTime>04/08/2025 08:06:34</publishTime>
+    </File>
+    <File Include="Microsoft.IdentityModel.Protocols.dll">
+      <publishTime>07/23/2024 05:08:56</publishTime>
+    </File>
+    <File Include="Microsoft.IdentityModel.Protocols.OpenIdConnect.dll">
+      <publishTime>07/23/2024 05:08:56</publishTime>
+    </File>
+    <File Include="Microsoft.IdentityModel.Tokens.dll">
+      <publishTime>04/08/2025 08:07:04</publishTime>
+    </File>
+    <File Include="Microsoft.OpenApi.dll">
+      <publishTime>08/06/2024 14:45:10</publishTime>
+    </File>
+    <File Include="Npgsql.dll">
+      <publishTime>02/25/2025 03:08:08</publishTime>
+    </File>
+    <File Include="System.IdentityModel.Tokens.Jwt.dll">
+      <publishTime>04/08/2025 08:06:44</publishTime>
+    </File>
+    <File Include="web.config">
+      <publishTime>04/29/2025 18:41:51</publishTime>
+    </File>
+  </ItemGroup>
 </Project>
